@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-let scene, camera, renderer, jet;
+let scene, camera, renderer, bird;
 let mixer; // Animation mixer for bird
 let mountains = []; // Array to hold repeating mountains
 let port, reader;
@@ -12,7 +12,6 @@ let smoothedPitch = 0;
 const smoothingFactor = 0.2; // Increased from 0.1 to 0.2 for more responsiveness while still smoothing
 
 // Bird configuration
-let currentJetType = 'bird'; // Only bird
 const birdConfig = {
   path: './bird.glb',
   cameraDistance: 50,
@@ -29,7 +28,7 @@ function init() {
   // Create cloud field
   createCloudField();
   
-  // Create camera - positioned higher and much further back from the jet
+  // Create camera - positioned higher and much further back from the bird
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.set(0, 8, 20);
   camera.lookAt(0, 0, 0);
@@ -44,8 +43,8 @@ function init() {
   // Add lighting
   addLighting();
   
-  // Load fighter jet model
-  loadFighterJet();
+  // Load Bird
+  loadBird();
   
   // Add environment
   addEnvironment();
@@ -76,22 +75,11 @@ function addLighting() {
   scene.add(directionalLight);
 }
 
-function adjustLighting(brightness) {
-  if (ambientLight && directionalLight) {
-    ambientLight.intensity = 2.0 * brightness;
-    directionalLight.intensity = 2.5 * brightness;
-  }
-}
-
-function loadFighterJet() {
+function loadBird() {
   const config = birdConfig;
   const loader = new GLTFLoader();
   
-  // Remove existing jet if present
-  if (jet) {
-    scene.remove(jet);
-    jet = null;
-  }
+  // Remove existing  if present
   
   // Stop existing animation mixer
   if (mixer) {
@@ -102,22 +90,21 @@ function loadFighterJet() {
   // Adjust camera distance based on jet type
   camera.position.z = config.cameraDistance;
   
-  // Adjust lighting brightness based on jet type
-  adjustLighting(config.brightness);
+  // Adjust lighting brightness based on jet typ
   
   loader.load(config.path, function(gltf) {
-    jet = gltf.scene;
+    bird = gltf.scene;
     
     // Scale and position the jet based on config
     const scale = config.scale || 2.0;
-    jet.scale.set(scale, scale, scale);
+    bird.scale.set(scale, scale, scale);
     
     // Position the bird
-    jet.position.set(-45, -25, 0); // Move bird left to center it
-    jet.rotation.y = Math.PI / 2;
+    bird.position.set(-45, -25, 0); // Move bird left to center it
+    bird.rotation.y = Math.PI / 2;
     
     // Enable shadows
-    jet.traverse(function(child) {
+    bird.traverse(function(child) {
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
@@ -126,7 +113,7 @@ function loadFighterJet() {
     
     // Setup animation for bird
     if (gltf.animations && gltf.animations.length > 0) {
-      mixer = new THREE.AnimationMixer(jet);
+      mixer = new THREE.AnimationMixer(bird);
       
       // Play all animations at 0.5x speed
       gltf.animations.forEach((clip) => {
@@ -138,44 +125,12 @@ function loadFighterJet() {
       console.log(`Bird animations loaded: ${gltf.animations.length} animations`);
     }
     
-    scene.add(jet);
+    scene.add(bird);
     console.log('Bird loaded successfully');
   }, undefined, function(error) {
     console.error('Error loading bird model:', error);
     // Create a simple placeholder if model fails to load
-    createPlaceholderJet();
   });
-}
-
-function createPlaceholderJet() {
-  // Create a simple jet shape using basic geometries
-  const jetGroup = new THREE.Group();
-  
-  // Fuselage
-  const fuselageGeometry = new THREE.CylinderGeometry(0.3, 0.1, 4, 8);
-  const fuselageMaterial = new THREE.MeshLambertMaterial({ color: 0x666666 });
-  const fuselage = new THREE.Mesh(fuselageGeometry, fuselageMaterial);
-  fuselage.rotation.z = Math.PI / 2;
-  jetGroup.add(fuselage);
-  
-  // Wings
-  const wingGeometry = new THREE.BoxGeometry(4, 0.1, 1);
-  const wingMaterial = new THREE.MeshLambertMaterial({ color: 0x888888 });
-  const wings = new THREE.Mesh(wingGeometry, wingMaterial);
-  jetGroup.add(wings);
-  
-  // Tail
-  const tailGeometry = new THREE.BoxGeometry(0.1, 1.5, 0.8);
-  const tailMaterial = new THREE.MeshLambertMaterial({ color: 0x666666 });
-  const tail = new THREE.Mesh(tailGeometry, tailMaterial);
-  tail.position.z = -1.5;
-  jetGroup.add(tail);
-  
-  jetGroup.scale.set(1.5, 1.5, 1.5);
-  jet = jetGroup;
-  scene.add(jet);
-  
-  console.log('Using placeholder jet model');
 }
 
 // Cloud field system
@@ -277,46 +232,7 @@ function createBackgroundJet() {
     clouds.push(backgroundJet); // Add to clouds array so it moves with the same system
   }, undefined, function(error) {
     console.error('Error loading background jet:', error);
-    // If jet fails to load, create a cloud instead
-    createCloudFallback();
   });
-}
-
-function createCloudFallback() {
-  // Fallback function to create a regular cloud if jet loading fails
-  const cloudGroup = new THREE.Group();
-  
-  const numSpheres = Math.floor(Math.random() * 5) + 4;
-  for (let i = 0; i < numSpheres; i++) {
-    const sphereSize = Math.random() * 3 + 2;
-    const cloudGeometry = new THREE.SphereGeometry(sphereSize, 8, 6);
-    const cloudMaterial = new THREE.MeshLambertMaterial({ 
-      color: 0xffffff,
-      transparent: true,
-      opacity: Math.random() * 0.2 + 0.8
-    });
-    const cloudSphere = new THREE.Mesh(cloudGeometry, cloudMaterial);
-    
-    cloudSphere.position.set(
-      (Math.random() - 0.5) * 8,
-      (Math.random() - 0.5) * 4,
-      (Math.random() - 0.5) * 6
-    );
-    
-    cloudGroup.add(cloudSphere);
-  }
-  
-  cloudGroup.position.set(
-    (Math.random() - 0.5) * 400,
-    (Math.random() - 0.5) * 200 + 50,
-    Math.random() * 600 - 400
-  );
-  
-  const scale = Math.random() * 2 + 1;
-  cloudGroup.scale.set(scale, scale, scale);
-  
-  scene.add(cloudGroup);
-  clouds.push(cloudGroup);
 }
 
 function updateClouds() {
@@ -417,45 +333,7 @@ function createNewBackgroundJetAhead() {
   }, undefined, function(error) {
     console.error('Error loading background jet ahead:', error);
     // If jet fails to load, create a cloud instead
-    createNewCloudAheadFallback();
   });
-}
-
-function createNewCloudAheadFallback() {
-  // Fallback function to create a regular cloud ahead if jet loading fails
-  const cloudGroup = new THREE.Group();
-  
-  const numSpheres = Math.floor(Math.random() * 5) + 4;
-  for (let i = 0; i < numSpheres; i++) {
-    const sphereSize = Math.random() * 3 + 2;
-    const cloudGeometry = new THREE.SphereGeometry(sphereSize, 8, 6);
-    const cloudMaterial = new THREE.MeshLambertMaterial({ 
-      color: 0xffffff,
-      transparent: true,
-      opacity: Math.random() * 0.2 + 0.8
-    });
-    const cloudSphere = new THREE.Mesh(cloudGeometry, cloudMaterial);
-    
-    cloudSphere.position.set(
-      (Math.random() - 0.5) * 8,
-      (Math.random() - 0.5) * 4,
-      (Math.random() - 0.5) * 6
-    );
-    
-    cloudGroup.add(cloudSphere);
-  }
-  
-  cloudGroup.position.set(
-    (Math.random() - 0.5) * 400,
-    (Math.random() - 0.5) * 200 + 50,
-    -Math.random() * 200 - 400
-  );
-  
-  const scale = Math.random() * 2 + 1;
-  cloudGroup.scale.set(scale, scale, scale);
-  
-  scene.add(cloudGroup);
-  clouds.push(cloudGroup);
 }
 
 function addEnvironment() {
@@ -625,7 +503,7 @@ function parseAngleData(dataString) {
         // Log both raw and smoothed values
         console.log(`Raw: Roll: ${roll.toFixed(1)}°, Pitch: ${pitch.toFixed(1)}° | Smoothed: Roll: ${smoothedRoll.toFixed(1)}°, Pitch: ${smoothedPitch.toFixed(1)}°`);
         
-        updateJetRotation(smoothedRoll, smoothedPitch);
+        updateBirdRotation(smoothedRoll, smoothedPitch);
       }
     }
   } catch (error) {
@@ -633,26 +511,24 @@ function parseAngleData(dataString) {
   }
 }
 
-function updateJetRotation(roll, pitch) {
-  if (jet) {
-    if (currentJetType === 'bird') {
-      // For bird: use accelerometer to control position instead of rotation
-      // Roll input (left/right tilt) controls X-axis position (left/right movement)
-      // Pitch input (forward/back tilt) controls Z-axis position (forward/back movement)
-      
-      const rollSensitivity = 2.0; // Adjust sensitivity for X movement
-      const pitchSensitivity = 2.0; // Adjust sensitivity for Z movement
-      
-      // Update bird position based on accelerometer input
-      jet.position.x = roll * rollSensitivity - 45; // Roll controls left/right position (offset by -45)
-      jet.position.z = -pitch * pitchSensitivity; // Pitch controls forward/back position (reversed)
-      jet.position.y = -25; // Keep Y position fixed
-      
-      // Keep bird facing the same direction
-      jet.rotation.y = Math.PI / 2; // Maintain base rotation
-      jet.rotation.x = 0; // No rotation
-      jet.rotation.z = 0; // No rotation
-    }
+function updateBirdRotation(roll, pitch) {
+  if (bird) {
+    // For bird: use accelerometer to control position instead of rotation
+    // Roll input (left/right tilt) controls X-axis position (left/right movement)
+    // Pitch input (forward/back tilt) controls Z-axis position (forward/back movement)
+    
+    const rollSensitivity = 2.0; // Adjust sensitivity for X movement
+    const pitchSensitivity = 2.0; // Adjust sensitivity for Z movement
+    
+    // Update bird position based on accelerometer input
+    bird.position.x = roll * rollSensitivity - 45; // Roll controls left/right position (offset by -45)
+    bird.position.z = -pitch * pitchSensitivity; // Pitch controls forward/back position (reversed)
+    bird.position.y = -25; // Keep Y position fixed
+    
+    // Keep bird facing the same direction
+    bird.rotation.y = Math.PI / 2; // Maintain base rotation
+    bird.rotation.x = 0; // No rotation
+    bird.rotation.z = 0; // No rotation
   }
 }
 
@@ -681,8 +557,8 @@ function animate() {
     mixer.update(0.016); // Update with ~60fps delta time
   }
   
-  // Keep camera stationary behind the jet
-  // Camera stays fixed watching the jet perform maneuvers
+  // Keep camera stationary behind the Bird
+  // Camera stays fixed watching the Bird perform maneuvers
   camera.lookAt(0, 0, 0);
   
   renderer.render(scene, camera);
