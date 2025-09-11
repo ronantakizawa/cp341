@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Colorado Sky Runner</title>
+    <style>
+      body {
+        margin: R0;
+        padding: 0;
+        background-color: #000;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+      }
+      
+      #container {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+      }
+      
+      #ui {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 100;
+        color: white;
+        font-size: 14px;
+      }
+      
+      #startBtn {
+        background: #ff4444;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+      
+      #startBtn:hover {
+        background: #cc3333;
+      }
+      
+      #status {
+        margin-bottom: 10px;
+      }
+      
+      #logo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 200;
+        max-width: 500px;
+        max-height: 500px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <img id="logo" src="./logo.png" alt="Logo">
+      <div id="ui">
+        <div id="status">Status: Disconnected</div>
+        <button id="startBtn">Connect MicroBit</button>
+      </div>
+    </div>
+    
+    
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+        }
+      }
+    </script>
+    <script type="module" src="coloradoskyrunner.js"></script>
+  </body>
+</html>
