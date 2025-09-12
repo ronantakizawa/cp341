@@ -3,6 +3,11 @@
 
 <img width="757" height="296" alt="logo" src="https://github.com/user-attachments/assets/af92becd-e44b-443e-af54-464a9bae1bd0" />
 
+## Install Instrcutions
+- Clone Repo
+- Install all assets in assets.txt
+- Run server.py
+
 Overview:
 SaveTheBirds is a custom input prototype for a bird-themed game. The project explores how embodied controls (glove-mounted Micro:bits) can simulate a day in the life of an endangered bird species in an engaging and socially impactful way. Inspired by the game StarFox, our game emphasizes bird conservation and migration themes, blending fun gameplay with meaningful and educational context.
 At this stage in our project, the main focus is on the controller rather than the full game. The glove-mounted Micro:bits provide tilt feedback through the accelerometer, radio signals to communicate with the game, and a rough visual game design will demonstrate how these inputs affect the birds movement and gameplay.
