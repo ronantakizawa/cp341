@@ -3,11 +3,11 @@
 ## Owen - Ronan - Nate ##
 
 Overview:
-SaveTheBirds is a custom input prototype for a bird-themed game. The project explores how embodied controls (glove-mounted MicroBits) can simulate a day in the life of an endangered bird species in an engaging and socially impactful way. Inspired by the game StarFox, our game emphasizes bird conservation and migration themes, blending fun gameplay with meaningful and educational context.
-At this stage in our project, the main focus is on the controller rather than the full game. The glove-mounted MicroBits provide tilt feedback through the accelerometer, radio signals to communicate with the game, and a rough visual game design will demonstrate how these inputs affect the birds movement and gameplay.
+SaveTheBirds is a custom input prototype for a bird-themed game. The project explores how embodied controls (glove-mounted Micro:bits) can simulate a day in the life of an endangered bird species in an engaging and socially impactful way. Inspired by the game StarFox, our game emphasizes bird conservation and migration themes, blending fun gameplay with meaningful and educational context.
+At this stage in our project, the main focus is on the controller rather than the full game. The glove-mounted Micro:bits provide tilt feedback through the accelerometer, radio signals to communicate with the game, and a rough visual game design will demonstrate how these inputs affect the birds movement and gameplay.
 
 Current Features:
-- Glove-Mounted Microbit
+- Glove-Mounted Micro:bit
 - Wrist tilt controls banking left/right.
 - Forward/backward tilt maps to climbing/diving.
 - Flapping motion with arms  = flap / ascend.
@@ -23,11 +23,11 @@ Planned Features:
 Setup (Prototype Stage):
 
 Wear the glove controllers:
-- Attach a MicroBit to each glove and power them with their batteries.
+- Attach a Micro:bit to each glove and power them with their batteries.
 
-Connect the receiver MicroBit:
-- Plug a third MicroBit into your computer via USB.
-- This MicroBit listens for radio signals from the glove controllers.
+Connect the receiver Micro:bit\:
+- Plug a third Micro:bit into your computer via USB.
+- This Micro:bit listens for radio signals from the glove controllers.
 
 Run the prototype program:
 - Launch the screen mock on your computer.
