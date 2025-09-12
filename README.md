@@ -1,6 +1,7 @@
-## cp341finalproject ##
-## README – SaveTheBirds Prototype ##
+## Colorado Sky Runner ##
 ## Owen - Ronan - Nate ##
+
+<img width="757" height="296" alt="logo" src="https://github.com/user-attachments/assets/af92becd-e44b-443e-af54-464a9bae1bd0" />
 
 Overview:
 SaveTheBirds is a custom input prototype for a bird-themed game. The project explores how embodied controls (glove-mounted Micro:bits) can simulate a day in the life of an endangered bird species in an engaging and socially impactful way. Inspired by the game StarFox, our game emphasizes bird conservation and migration themes, blending fun gameplay with meaningful and educational context.
