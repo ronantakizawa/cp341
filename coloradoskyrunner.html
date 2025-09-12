@@ -55,14 +55,30 @@
         max-width: 500px;
         max-height: 500px;
       }
+      
+      #score {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 100;
+        color: white;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      
     </style>
   </head>
   <body>
     <div id="container">
       <img id="logo" src="./logo.png" alt="Logo">
+      <div id="score">Score: 0</div>
       <div id="ui">
         <div id="status">Status: Disconnected</div>
         <button id="startBtn">Connect MicroBit</button>
+        <div style="color: white; margin-top: 10px; font-size: 12px;">
+          Tilt sideways to move sideways<br>
+          Tilt forwards to move forwards
+        </div>
       </div>
     </div>
     
@@ -75,6 +91,6 @@
         }
       }
     </script>
-    <script type="module" src="coloradoskyrunner.js"></script>
+    <script type="module" src="main.js"></script>
   </body>
 </html>

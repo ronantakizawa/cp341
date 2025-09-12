@@ -1,90 +1,27 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
+import { isConnected } from './microbit.js';
 
 export let clouds = [];
-const cloudSpeed = 0.5;
-const maxClouds = 10;
+const cloudSpeed = 1.5;
+const maxClouds = 20;
 
-export function createCloudField() {
-  for (let i = 0; i < maxClouds; i++) {
-    createCloud();
+// Start spawning objects when MicroBit connects
+export function startObjectSpawning() {
+  console.log('Starting object spawning, isConnected:', isConnected);
+  // Create initial objects ahead when game starts
+  for (let i = 0; i < 3; i++) {
+    createNewGoldenHoopAhead(); // Force create hoops
   }
+  if (Math.random() < 0.3) { // 30% chance to spawn a jet initially
+    createNewBackgroundJetAhead();
+  }
+  console.log('Objects spawned, clouds array length:', clouds.length);
 }
 
-function createCloud() {
-  if (Math.random() < 0.1) {
-    createBackgroundJet();
-    return;
-  }
-  
-  const cloudGroup = new THREE.Group();
-  
-  const numSpheres = Math.floor(Math.random() * 5) + 4;
-  for (let i = 0; i < numSpheres; i++) {
-    const sphereSize = Math.random() * 3 + 2;
-    const cloudGeometry = new THREE.SphereGeometry(sphereSize, 8, 6);
-    const cloudMaterial = new THREE.MeshLambertMaterial({ 
-      color: 0xffffff,
-      transparent: true,
-      opacity: Math.random() * 0.2 + 0.8
-    });
-    const cloudSphere = new THREE.Mesh(cloudGeometry, cloudMaterial);
-    
-    cloudSphere.position.set(
-      (Math.random() - 0.5) * 8,
-      (Math.random() - 0.5) * 4,
-      (Math.random() - 0.5) * 6
-    );
-    
-    cloudGroup.add(cloudSphere);
-  }
-  
-  cloudGroup.position.set(
-    (Math.random() - 0.5) * 400,
-    (Math.random() - 0.5) * 80 + 20,
-    Math.random() * 600 - 400
-  );
-  
-  const scale = Math.random() * 2 + 1;
-  cloudGroup.scale.set(scale, scale, scale);
-  
-  scene.add(cloudGroup);
-  clouds.push(cloudGroup);
-}
 
-function createBackgroundJet() {
-  const loader = new GLTFLoader();
-  
-  loader.load('./jet.glb', function(gltf) {
-    const backgroundJet = gltf.scene;
-    
-    const scale = (Math.random() * 1.5 + 0.5) * 2;
-    backgroundJet.scale.set(scale, scale, scale);
-    
-    backgroundJet.position.set(
-      (Math.random() - 0.5) * 400,
-      (Math.random() - 0.5) * 80 + 20,
-      Math.random() * 600 - 400
-    );
-    
-    backgroundJet.rotation.y = - Math.PI;
-    backgroundJet.rotation.x = 0;
-    backgroundJet.rotation.z = 0;
-    
-    backgroundJet.traverse(function(child) {
-      if (child.isMesh) {
-        child.castShadow = true;
-        child.receiveShadow = true;
-      }
-    });
-    
-    scene.add(backgroundJet);
-    clouds.push(backgroundJet);
-  }, undefined, function(error) {
-    console.error('Error loading background jet:', error);
-  });
-}
+
 
 export function updateClouds() {
   for (let i = clouds.length - 1; i >= 0; i--) {
@@ -98,10 +35,35 @@ export function updateClouds() {
       createNewCloudAhead();
     }
   }
+  
+  // Ensure minimum number of objects are always spawning ahead
+  if (isConnected && clouds.length < 5) {
+    console.log('Spawning more objects, current count:', clouds.length);
+    for (let i = clouds.length; i < 5; i++) {
+      if (Math.random() < 0.9) {
+        createNewGoldenHoopAhead();
+      } else {
+        createNewBackgroundJetAhead();
+      }
+    }
+  }
 }
 
 function createNewCloudAhead() {
-  if (Math.random() < 0.01) {
+  // Only create objects if MicroBit is connected
+  if (!isConnected) {
+    console.log('Not creating object - MicroBit not connected');
+    return;
+  }
+  
+  console.log('Creating new object ahead');
+  
+  if (Math.random() < 0.15) {
+    createNewGoldenHoopAhead();
+    return;
+  }
+  
+  if (Math.random() < 0.1) {
     createNewBackgroundJetAhead();
     return;
   }
@@ -130,7 +92,7 @@ function createNewCloudAhead() {
   
   cloudGroup.position.set(
     (Math.random() - 0.5) * 400,
-    (Math.random() - 0.5) * 80 + 20,
+    Math.random() * 75 - 25,
     -Math.random() * 200 - 400
   );
   
@@ -151,14 +113,17 @@ function createNewBackgroundJetAhead() {
     backgroundJet.scale.set(scale, scale, scale);
     
     backgroundJet.position.set(
-      (Math.random() - 0.5) * 400,
-      (Math.random() - 0.5) * 80 + 20,
+      (Math.random() - 0.5) * 100, // Narrower X range for middle of screen
+      Math.random() * 30 + 5, // Narrower Y range targeting middle (5 to 35)
       -Math.random() * 200 - 400
     );
     
     backgroundJet.rotation.y = -Math.PI;
     backgroundJet.rotation.x = Math.PI ;
     backgroundJet.rotation.z = Math.PI;
+    
+    // Mark as jet for collision detection
+    backgroundJet.userData.isJet = true;
     
     backgroundJet.traverse(function(child) {
       if (child.isMesh) {
@@ -172,4 +137,35 @@ function createNewBackgroundJetAhead() {
   }, undefined, function(error) {
     console.error('Error loading background jet ahead:', error);
   });
+}
+
+
+function createNewGoldenHoopAhead() {
+  // Create a golden hoop using torus geometry
+  const hoopGeometry = new THREE.TorusGeometry(16, 3, 8, 16);
+  const hoopMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0xFFD700, // Golden color
+    shininess: 100,
+    specular: 0x444444
+  });
+  const hoop = new THREE.Mesh(hoopGeometry, hoopMaterial);
+  
+  // Mark as hoop for collision detection
+  hoop.userData.isHoop = true;
+  hoop.userData.collected = false;
+  
+  // Position new hoops far ahead
+  hoop.position.set(
+    (Math.random() - 0.5) * 200,
+    Math.random() * 75 - 25,
+    -Math.random() * 200 - 200  // Far ahead
+  );
+  
+  // Random rotation for variety
+  hoop.rotation.x = 0;
+  hoop.rotation.y = 0;
+  hoop.rotation.z = 0;
+  
+  scene.add(hoop);
+  clouds.push(hoop); // Add to clouds array for movement
 }
