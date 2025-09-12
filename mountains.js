@@ -3,7 +3,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
 
 export let mountains = [];
-const mountainSpeed = 0.5;
+const mountainSpeed = 0.6;
 const maxMountains = 5;
 const mountainSpacing = 150;
 let mountainModel = null;

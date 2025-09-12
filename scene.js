@@ -3,6 +3,11 @@ import * as THREE from 'three';
 export let scene, camera, renderer;
 export let ambientLight, directionalLight;
 
+// Camera shake system
+let basePosition = { x: 0, y: 8, z: 20 };
+let shakeIntensity = 0;
+let shakeDuration = 0;
+
 export function initScene() {
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x5483BF);
@@ -41,8 +46,41 @@ function onWindowResize() {
 }
 
 export function renderScene() {
+  // Apply camera shake
+  updateCameraShake();
+  
   camera.lookAt(0, 0, 0);
   renderer.render(scene, camera);
+}
+
+// Start camera shake with given intensity and duration
+export function startCameraShake(intensity, duration) {
+  shakeIntensity = Math.max(shakeIntensity, intensity); // Use strongest shake
+  shakeDuration = Math.max(shakeDuration, duration);
+}
+
+function updateCameraShake() {
+  if (shakeDuration > 0) {
+    // Generate random shake offset
+    const shakeX = (Math.random() - 0.5) * shakeIntensity;
+    const shakeY = (Math.random() - 0.5) * shakeIntensity;
+    const shakeZ = (Math.random() - 0.5) * shakeIntensity * 0.5; // Less Z shake
+    
+    // Apply shake to camera position
+    camera.position.set(
+      basePosition.x + shakeX,
+      basePosition.y + shakeY,
+      basePosition.z + shakeZ
+    );
+    
+    // Reduce shake over time
+    shakeDuration -= 0.016; // Approximately 60fps
+    shakeIntensity *= 0.95; // Fade intensity
+  } else {
+    // Reset to base position when shake ends
+    camera.position.set(basePosition.x, basePosition.y, basePosition.z);
+    shakeIntensity = 0;
+  }
 }
 
 export { onWindowResize };
