@@ -3,7 +3,7 @@ import { loadBird, updateBirdAnimation, adjustHeight } from './bird.js';
 import { updateClouds, startObjectSpawning } from './clouds.js';
 import { createMountainField, updateMountains } from './mountains.js';
 import { connectMicrobit } from './microbit.js';
-import { checkHoopCollisions, checkJetCollisions, checkJetProximity, enableAudio } from './collisions.js';
+import { checkHoopCollisions, checkJetCollisions, checkJetProximity, checkSmogProximity, enableAudio } from './collisions.js';
 import { initCamera, startGestureDetection } from './gestures.js';
 
 async function init() {
@@ -72,6 +72,8 @@ function animate() {
     checkJetCollisions();
 
     checkJetProximity();
+
+    checkSmogProximity();
   }
 
   renderScene();

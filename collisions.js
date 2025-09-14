@@ -1,5 +1,5 @@
 import { getBirdPosition } from './bird.js';
-import { clouds } from './clouds.js';
+import { clouds, smogClouds } from './clouds.js';
 import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
 import { startCameraShake } from './scene.js';
@@ -8,6 +8,7 @@ import { pauseGame, resumeGame } from './main.js';
 let score = 0;
 let audioEnabled = false;
 let firstDistortionShown = false;
+let firstSmogShown = false;
 import * as THREE from 'three';
 import { getBuildingObstacles } from './environments.js';
 
@@ -66,6 +67,63 @@ function showJetWarning() {
     }
     resumeGame();
   }, 3000);
+}
+
+// Function to show smog warning
+function showSmogWarning() {
+  // Pause the game
+  pauseGame();
+
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 68, 68, 0.95);
+    color: white;
+    padding: 40px;
+    border-radius: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    max-width: 600px;
+    min-width: 500px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    line-height: 1.4;
+  `;
+  notification.textContent = 'Smog and human air pollution can affect bird\'s breathing and vision';
+
+  // Add to page
+  document.body.appendChild(notification);
+
+  // Auto-remove after 3 seconds and resume game
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+    resumeGame();
+  }, 3000);
+}
+
+// Handle smog effects
+function startSmogDistortion(intensity) {
+  // Show notification on first smog encounter
+  if (!firstSmogShown) {
+    showSmogWarning();
+    firstSmogShown = true;
+  }
+
+  // Apply visual distortion (reuse existing system)
+  if (audioEnabled && intensity > 0.4) {
+    // Use existing visual distortion system but don't show jet notification
+    const originalFirstDistortionShown = firstDistortionShown;
+    firstDistortionShown = true; // Temporarily prevent jet notification
+    startVisualDistortion(intensity);
+    firstDistortionShown = originalFirstDistortionShown; // Restore original state
+  }
 }
 
 // Preload the audio
@@ -244,6 +302,45 @@ export function checkJetProximity() {
       
       // Play jet interference sound
       startVisualDistortion(intensity);
+    }
+  }
+}
+
+export function checkSmogProximity() {
+  // Only run proximity detection if MicroBit is connected
+  if (!isConnected) return;
+
+  const birdPos = getBirdPosition();
+  if (!birdPos) return;
+
+  let closestSmogDistance = Infinity;
+
+  for (let i = 0; i < smogClouds.length; i++) {
+    const smog = smogClouds[i];
+
+    // Check if this is a smog cloud
+    if (smog.userData && smog.userData.isSmog) {
+      const distance = birdPos.distanceTo(smog.position);
+
+      if (distance < closestSmogDistance) {
+        closestSmogDistance = distance;
+      }
+    }
+  }
+
+  // Apply effects when near smog
+  if (closestSmogDistance < 80) { // Within smog interference range
+    // Calculate effect intensity based on distance
+    const maxSmogDistance = 80;
+    const minSmogDistance = 20;
+
+    if (closestSmogDistance > minSmogDistance) {
+      // Scale intensity: closer smog = more intense effects
+      const distanceRatio = (maxSmogDistance - closestSmogDistance) / (maxSmogDistance - minSmogDistance);
+      const intensity = Math.max(0.3, distanceRatio); // Minimum intensity of 0.3
+
+      // Apply visual distortion and show smog warning
+      startSmogDistortion(intensity);
     }
   }
 }

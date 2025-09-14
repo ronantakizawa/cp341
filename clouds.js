@@ -4,6 +4,7 @@ import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
 
 export let clouds = [];
+export let smogClouds = [];
 const cloudSpeed = 1.5;
 const maxClouds = 20;
 
@@ -17,6 +18,12 @@ export function startObjectSpawning() {
   if (Math.random() < 0.3) { // 30% chance to spawn a jet initially
     createNewBackgroundJetAhead();
   }
+  // Spawn some initial smog clouds
+  for (let i = 0; i < 2; i++) {
+    if (Math.random() < 0.4) {
+      createNewSmogCloudAhead();
+    }
+  }
   console.log('Objects spawned, clouds array length:', clouds.length);
 }
 
@@ -24,15 +31,32 @@ export function startObjectSpawning() {
 
 
 export function updateClouds() {
+  // Update regular clouds
   for (let i = clouds.length - 1; i >= 0; i--) {
     const cloud = clouds[i];
     cloud.position.z += cloudSpeed;
-    
+
     if (cloud.position.z > 50) {
       scene.remove(cloud);
       clouds.splice(i, 1);
-      
+
       createNewCloudAhead();
+    }
+  }
+
+  // Update smog clouds
+  for (let i = smogClouds.length - 1; i >= 0; i--) {
+    const smog = smogClouds[i];
+    smog.position.z += cloudSpeed;
+
+    if (smog.position.z > 50) {
+      scene.remove(smog);
+      smogClouds.splice(i, 1);
+
+      // Occasionally spawn new smog clouds
+      if (Math.random() < 0.3) {
+        createNewSmogCloudAhead();
+      }
     }
   }
   
@@ -62,9 +86,14 @@ function createNewCloudAhead() {
     createNewGoldenHoopAhead();
     return;
   }
-  
+
   if (Math.random() < 0.1) {
     createNewBackgroundJetAhead();
+    return;
+  }
+
+  if (Math.random() < 0.2) {
+    createNewSmogCloudAhead();
     return;
   }
   
@@ -168,4 +197,45 @@ function createNewGoldenHoopAhead() {
   
   scene.add(hoop);
   clouds.push(hoop); // Add to clouds array for movement
+}
+
+function createNewSmogCloudAhead() {
+  const smogGroup = new THREE.Group();
+
+  // Create a darker, denser cloud structure
+  const numSpheres = Math.floor(Math.random() * 8) + 6;
+  for (let i = 0; i < numSpheres; i++) {
+    const sphereSize = Math.random() * 4 + 3;
+    const smogGeometry = new THREE.SphereGeometry(sphereSize, 8, 6);
+    const smogMaterial = new THREE.MeshLambertMaterial({
+      color: 0x404040, // Dark gray
+      transparent: true,
+      opacity: Math.random() * 0.3 + 0.6 // More opaque than regular clouds
+    });
+    const smogSphere = new THREE.Mesh(smogGeometry, smogMaterial);
+
+    smogSphere.position.set(
+      (Math.random() - 0.5) * 12,
+      (Math.random() - 0.5) * 6,
+      (Math.random() - 0.5) * 8
+    );
+
+    smogGroup.add(smogSphere);
+  }
+
+  // Mark as smog for detection
+  smogGroup.userData.isSmog = true;
+
+  // Position smog clouds at lower altitudes (more likely near ground pollution)
+  smogGroup.position.set(
+    (Math.random() - 0.5) * 350,
+    Math.random() * 40 - 30, // Lower altitude range
+    -Math.random() * 200 - 300
+  );
+
+  const scale = Math.random() * 1.5 + 1.2;
+  smogGroup.scale.set(scale, scale, scale);
+
+  scene.add(smogGroup);
+  smogClouds.push(smogGroup);
 }
