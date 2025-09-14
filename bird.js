@@ -63,10 +63,15 @@ export function loadBird() {
 
 export function updateBirdRotation(roll, pitch) {
   if (bird) {
-    const rollSensitivity = 2.0;
-    const pitchSensitivity = 2.0;
-    
-    bird.position.x = roll * rollSensitivity - 45;
+  const rollSensitivity = 3.2; // slightly reduced for narrower field
+  const pitchSensitivity = 2.0;
+  const baseXOffset = -40; // recenter after narrowing lanes
+  const maxHorizontal = 170; // reduced from 220 to match new city lane spread
+
+  let targetX = roll * rollSensitivity + baseXOffset;
+  if (targetX > maxHorizontal) targetX = maxHorizontal;
+  if (targetX < -maxHorizontal) targetX = -maxHorizontal;
+  bird.position.x = targetX;
     bird.position.z = -pitch * pitchSensitivity;
     bird.position.y = currentHeight; // Use current height instead of fixed -25
     
