@@ -4,13 +4,20 @@ import { updateClouds, startObjectSpawning } from './clouds.js';
 import { createMountainField, updateMountains } from './mountains.js';
 import { connectMicrobit } from './microbit.js';
 import { checkHoopCollisions, checkJetCollisions, checkJetProximity, enableAudio } from './collisions.js';
-import { initEnvironments, updateEnvironments } from './environments.js';
+import { initCamera, startArUcoDetection } from './jsaruco.js';
 
 async function init() {
   initScene();
+  
   loadBird();
-  createMountainField(); // still spawns mountains (they get wrapped later)
-  await initEnvironments(); // start environment manager and keys
+  
+  createMountainField();
+  
+  // Initialize camera for ArUco detection
+  const cameraReady = await initCamera();
+  if (cameraReady) {
+    startArUcoDetection();
+  }
   
   document.getElementById('startBtn').addEventListener('click', function() {
     // Enable audio on button click
@@ -23,11 +30,11 @@ async function init() {
     }, 1000); // Wait 1 second after connection starts
   });
   
-  // Add arrow key event listeners for height control
+  // Keep arrow key event listeners as backup controls
   document.addEventListener('keydown', function(event) {
     // Enable audio on first keypress
     enableAudio();
-    
+
     if (event.code === 'ArrowUp') {
       event.preventDefault();
       adjustHeight(1); // Go up
@@ -40,20 +47,21 @@ async function init() {
   animate();
 }
 
-let lastTime = performance.now();
 function animate() {
   requestAnimationFrame(animate);
-  const now = performance.now();
-  const dt = (now - lastTime) / 1000;
-  lastTime = now;
-
+  
   updateClouds();
-  updateMountains(); // keeps mountains moving when active
-  updateEnvironments(dt); // handles switching
+  
+  updateMountains();
+  
   updateBirdAnimation();
+  
   checkHoopCollisions();
+  
   checkJetCollisions();
+  
   checkJetProximity();
+  
   renderScene();
 }
 

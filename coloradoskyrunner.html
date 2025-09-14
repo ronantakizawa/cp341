@@ -5,7 +5,7 @@
     <title>Colorado Sky Runner</title>
     <style>
       body {
-        margin: 0;
+        margin: R0;
         padding: 0;
         background-color: #000;
         overflow: hidden;
@@ -66,6 +66,27 @@
         font-weight: bold;
       }
       
+      #camera {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        z-index: 100;
+        width: 160px;
+        height: 120px;
+        border: 2px solid white;
+        background: black;
+      }
+      
+      #cameraStatus {
+        position: absolute;
+        bottom: 150px;
+        right: 20px;
+        z-index: 100;
+        color: white;
+        font-size: 12px;
+        text-align: right;
+      }
+      
     </style>
   </head>
   <body>
@@ -77,11 +98,19 @@
         <button id="startBtn">Connect MicroBit</button>
         <div style="color: white; margin-top: 10px; font-size: 12px;">
           Tilt sideways to move sideways<br>
-          Tilt forwards to move forwards
+          Tilt forwards to move forwards<br>
+          Hold ArUco marker and move it:<br>
+          Move UP = Bird goes up | Move DOWN = Bird goes down
         </div>
       </div>
+      <video id="camera" autoplay muted></video>
+      <div id="cameraStatus">Camera: Off</div>
     </div>
     
+    
+    <!-- js-aruco library from jsDelivr CDN -->
+    <script src="https://cdn.jsdelivr.net/gh/jcmellado/js-aruco@master/src/cv.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/jcmellado/js-aruco@master/src/aruco.js"></script>
     
     <script type="importmap">
       {
