@@ -99,8 +99,8 @@
         <div style="color: white; margin-top: 10px; font-size: 12px;">
           Tilt sideways to move sideways<br>
           Tilt forwards to move forwards<br>
-          Hold ArUco marker and move it:<br>
-          Move UP = Bird goes up | Move DOWN = Bird goes down
+          Hand gestures:<br>
+          👍 Thumbs UP = Bird goes up | 👎 Thumbs DOWN = Bird goes down
         </div>
       </div>
       <video id="camera" autoplay muted></video>
@@ -108,9 +108,10 @@
     </div>
     
     
-    <!-- js-aruco library from jsDelivr CDN -->
-    <script src="https://cdn.jsdelivr.net/gh/jcmellado/js-aruco@master/src/cv.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/jcmellado/js-aruco@master/src/aruco.js"></script>
+    <!-- MediaPipe Hands for gesture detection -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     
     <script type="importmap">
       {

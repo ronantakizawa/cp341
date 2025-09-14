@@ -4,7 +4,7 @@ import { updateClouds, startObjectSpawning } from './clouds.js';
 import { createMountainField, updateMountains } from './mountains.js';
 import { connectMicrobit } from './microbit.js';
 import { checkHoopCollisions, checkJetCollisions, checkJetProximity, enableAudio } from './collisions.js';
-import { initCamera, startArUcoDetection } from './jsaruco.js';
+import { initCamera, startGestureDetection } from './gestures.js';
 
 async function init() {
   initScene();
@@ -13,10 +13,10 @@ async function init() {
   
   createMountainField();
   
-  // Initialize camera for ArUco detection
+  // Initialize camera for gesture detection
   const cameraReady = await initCamera();
   if (cameraReady) {
-    startArUcoDetection();
+    startGestureDetection();
   }
   
   document.getElementById('startBtn').addEventListener('click', function() {

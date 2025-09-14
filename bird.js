@@ -7,7 +7,7 @@ export let mixer;
 
 // Height control system
 const minHeight = -25; // Above mountains (mountains are around -115)
-const maxHeight = 50;  // High in the sky
+const maxHeight = 25;  // Reduced max height
 let currentHeight = -25; // Default height
 const heightStep = 10; // How much to increase each press
 
