@@ -7,6 +7,8 @@ import { startCameraShake } from './scene.js';
 let score = 0;
 let audioEnabled = false;
 let firstDistortionShown = false;
+import * as THREE from 'three';
+import { getBuildingObstacles } from './environments.js';
 
 // Create audio objects
 const pointSound = new Audio('./score.mp3');
@@ -100,6 +102,34 @@ export function checkJetCollisions() {
         console.log('Bird hit a jet! Game Over!');
         
         gameOver();
+      }
+    }
+  }
+
+  // Building collisions (city streaming)
+  const buildings = getBuildingObstacles();
+  if (buildings && buildings.length) {
+    const birdPos = getBirdPosition();
+    if (birdPos) {
+  const birdRadius = 14; // slightly smaller to allow tighter navigation
+      for (const b of buildings) {
+        if (!b.isMesh) continue;
+        // Quick reject if building too far in Z (outside interaction band)
+        const worldZ = b.getWorldPosition(new THREE.Vector3()).z;
+        if (worldZ < birdPos.z - 80 || worldZ > birdPos.z + 120) continue;
+        const box = new THREE.Box3().setFromObject(b);
+        const clampedX = THREE.MathUtils.clamp(birdPos.x, box.min.x, box.max.x);
+        const clampedY = THREE.MathUtils.clamp(birdPos.y, box.min.y, box.max.y);
+        const clampedZ = THREE.MathUtils.clamp(birdPos.z, box.min.z, box.max.z);
+        const dx = birdPos.x - clampedX;
+        const dy = birdPos.y - clampedY;
+        const dz = birdPos.z - clampedZ;
+        if (dx*dx + dy*dy + dz*dz < birdRadius * birdRadius) {
+          console.log('Building collision!');
+          import('./scene.js').then(m => m.startCameraShake(1.2, 0.9));
+          gameOver();
+          break;
+        }
       }
     }
   }

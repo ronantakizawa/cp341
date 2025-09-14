@@ -4,13 +4,13 @@ import { updateClouds, startObjectSpawning } from './clouds.js';
 import { createMountainField, updateMountains } from './mountains.js';
 import { connectMicrobit } from './microbit.js';
 import { checkHoopCollisions, checkJetCollisions, checkJetProximity, enableAudio } from './collisions.js';
+import { initEnvironments, updateEnvironments } from './environments.js';
 
-function init() {
+async function init() {
   initScene();
-  
   loadBird();
-  
-  createMountainField();
+  createMountainField(); // still spawns mountains (they get wrapped later)
+  await initEnvironments(); // start environment manager and keys
   
   document.getElementById('startBtn').addEventListener('click', function() {
     // Enable audio on button click
@@ -40,21 +40,20 @@ function init() {
   animate();
 }
 
+let lastTime = performance.now();
 function animate() {
   requestAnimationFrame(animate);
-  
+  const now = performance.now();
+  const dt = (now - lastTime) / 1000;
+  lastTime = now;
+
   updateClouds();
-  
-  updateMountains();
-  
+  updateMountains(); // keeps mountains moving when active
+  updateEnvironments(dt); // handles switching
   updateBirdAnimation();
-  
   checkHoopCollisions();
-  
   checkJetCollisions();
-  
   checkJetProximity();
-  
   renderScene();
 }
 

@@ -2,6 +2,10 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
 
+// Container to allow whole mountain environment to be swapped out
+export const mountainGroup = new THREE.Group();
+mountainGroup.name = 'MountainGroup';
+
 export let mountains = [];
 const mountainSpeed = 0.6;
 const maxMountains = 5;
@@ -22,6 +26,10 @@ export function createMountainField() {
     
     for (let i = 0; i < maxMountains; i++) {
       createMountainFromCache(i * mountainSpacing - (maxMountains - 1) * mountainSpacing / 2);
+    }
+    // Ensure container added only once
+    if (!scene.getObjectByName('MountainGroup')) {
+      scene.add(mountainGroup);
     }
   }, undefined, function(error) {
     console.error('Error loading mountain model:', error);
@@ -54,7 +62,7 @@ function createMountainFromCache(zPosition = null) {
     }
   });
   
-  scene.add(mountain);
+  mountainGroup.add(mountain);
   mountains.push(mountain);
 }
 
