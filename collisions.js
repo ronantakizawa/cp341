@@ -3,6 +3,7 @@ import { clouds } from './clouds.js';
 import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
 import { startCameraShake } from './scene.js';
+import { pauseGame, resumeGame } from './main.js';
 
 let score = 0;
 let audioEnabled = false;
@@ -27,6 +28,45 @@ gameOverSound.addEventListener('error', function(e) {
 jetSound.addEventListener('error', function(e) {
   console.warn('Jet audio file not found or not supported:', e);
 });
+
+// Function to show non-blocking jet warning
+function showJetWarning() {
+  // Pause the game
+  pauseGame();
+
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 68, 68, 0.95);
+    color: white;
+    padding: 40px;
+    border-radius: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    max-width: 600px;
+    min-width: 500px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    line-height: 1.4;
+  `;
+  notification.textContent = 'Jets can distract the flight of birds, causing them to lose balance, temperament, and sight';
+
+  // Add to page
+  document.body.appendChild(notification);
+
+  // Auto-remove after 3 seconds and resume game
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.parentNode.removeChild(notification);
+    }
+    resumeGame();
+  }, 3000);
+}
 
 // Preload the audio
 pointSound.preload = 'auto';
@@ -210,9 +250,9 @@ export function checkJetProximity() {
 
 // Play jet interference sound (reusing function name for compatibility)
 function startVisualDistortion(intensity) {
-  // Show alert on first distortion
+  // Show notification on first distortion
   if (!firstDistortionShown) {
-    alert('Jets can distract the flight of birds, causing them to lose balance, temperament, and sight');
+    showJetWarning();
     firstDistortionShown = true;
   }
   

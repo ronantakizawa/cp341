@@ -1,4 +1,5 @@
 import { updateBirdRotation } from './bird.js';
+import { isPaused } from './main.js';
 
 let port, reader;
 export let isConnected = false;
@@ -72,16 +73,21 @@ async function readSerialData() {
 }
 
 function parseAngleData(dataString) {
+  // Don't update bird position if game is paused
+  if (isPaused) {
+    return;
+  }
+
   try {
     const parts = dataString.split(',');
     if (parts.length === 2) {
       const roll = parseFloat(parts[0]);
       const pitch = parseFloat(parts[1]);
-      
+
       if (!isNaN(roll) && !isNaN(pitch)) {
         smoothedRoll = smoothedRoll + smoothingFactor * (roll - smoothedRoll);
         smoothedPitch = smoothedPitch + smoothingFactor * (pitch - smoothedPitch);
-        
+
         updateBirdRotation(smoothedRoll, smoothedPitch);
       }
     }

@@ -1,5 +1,7 @@
 import { adjustHeight } from './bird.js';
 import { enableAudio } from './collisions.js';
+import { isConnected } from './microbit.js';
+import { isPaused } from './main.js';
 
 let video;
 let hands;
@@ -185,6 +187,17 @@ function processGesture(gesture, currentTime) {
 }
 
 function executeGestureAction(gesture) {
+  // Don't allow height changes if game is paused
+  if (isPaused) {
+    return;
+  }
+
+  // Only allow height changes if microbit is connected
+  if (!isConnected) {
+    updateCameraStatus('Connect MicroBit first!');
+    return;
+  }
+
   if (gesture === 'thumbs_up') {
     adjustHeight(1);
     updateCameraStatus('👍 UP!');

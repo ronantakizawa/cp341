@@ -47,21 +47,33 @@ async function init() {
   animate();
 }
 
+export let isPaused = false;
+
+export function pauseGame() {
+  isPaused = true;
+}
+
+export function resumeGame() {
+  isPaused = false;
+}
+
 function animate() {
   requestAnimationFrame(animate);
-  
-  updateClouds();
-  
-  updateMountains();
-  
-  updateBirdAnimation();
-  
-  checkHoopCollisions();
-  
-  checkJetCollisions();
-  
-  checkJetProximity();
-  
+
+  if (!isPaused) {
+    updateClouds();
+
+    updateMountains();
+
+    updateBirdAnimation();
+
+    checkHoopCollisions();
+
+    checkJetCollisions();
+
+    checkJetProximity();
+  }
+
   renderScene();
 }
 
