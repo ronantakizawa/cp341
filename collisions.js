@@ -1,5 +1,5 @@
 import { getBirdPosition } from './bird.js';
-import { clouds, smogClouds } from './clouds.js';
+import { clouds, smogClouds, thunderClouds } from './clouds.js';
 import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
 import { startCameraShake, startVisualDistortionEffect } from './scene.js';
@@ -229,7 +229,7 @@ function gameOver() {
   }
   
   // Show game over message
-  alert('Game Over! You lost all your lives.\n\nFinal Score: ' + score);
+  alert('Game Over! Score: ' + score);
   
   // Reload the page after a short delay to let the sound play
   setTimeout(() => {
@@ -312,13 +312,15 @@ export function checkSmogProximity() {
       const distanceRatio = (maxSmogDistance - closestSmogDistance) / (maxSmogDistance - minSmogDistance);
       const intensity = Math.max(0.3, distanceRatio); // Minimum intensity of 0.3
 
-      // Apply visual distortion and show smog warning
-      startSmogDistortion(intensity);
+      // Apply visual distortion and show smog warning (no jet sound)
+      startSmogDistortionEffect(intensity);
     }
   }
 }
 
-// Apply visual distortion and audio effects
+
+
+// Apply visual distortion and audio effects for jets
 function startVisualDistortion(intensity) {
   // Show notification on first distortion
   if (!firstDistortionShown) {
@@ -337,6 +339,18 @@ function startVisualDistortion(intensity) {
       console.log('Could not play jet sound:', error);
     });
   }
+}
+
+// Apply visual distortion effects for smog (no jet sound)
+function startSmogDistortionEffect(intensity) {
+  // Show notification on first smog encounter
+  if (!firstSmogShown) {
+    showSmogWarning();
+    firstSmogShown = true;
+  }
+
+  // Apply visual distortion effects only (no sound)
+  startVisualDistortionEffect(intensity, 3.0); // 3 second duration
 }
 
 export function getScore() {

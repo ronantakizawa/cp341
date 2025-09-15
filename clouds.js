@@ -4,9 +4,11 @@ import { scene } from './scene.js';
 import { getBirdPosition } from './bird.js';
 import { isConnected } from './microbit.js';
 import { getGameSpeed } from './main.js';
+import { getScore } from './collisions.js';
 
 export let clouds = [];
 export let smogClouds = [];
+export let thunderClouds = [];
 const cloudSpeed = 1.5;
 const maxClouds = 20;
 
@@ -16,6 +18,20 @@ const activeLightningBolts = [];
 const LIGHTNING_SPEED = 14; // much faster
 const LIGHTNING_LIFETIME = 1.2; // shorter lifetime
 const LIGHTNING_COOLDOWN = 1.5; // min seconds between bolts per cloud
+
+// Thunder sound system
+const thunderSound = new Audio('./thunder.mp3');
+thunderSound.addEventListener('error', function(e) {
+  console.warn('Thunder audio file not found or not supported:', e);
+});
+
+// Game over sound system
+const gameOverSound = new Audio('./gameover.mp3');
+gameOverSound.addEventListener('error', function(e) {
+  console.warn('Game over audio file not found or not supported:', e);
+});
+
+let audioEnabled = false;
 
 // Preload lightning.glb once
 const lightningLoader = new GLTFLoader();
@@ -38,6 +54,12 @@ export function startObjectSpawning() {
   for (let i = 0; i < 2; i++) {
     createNewSmogCloudAhead();
   }
+  // Spawn some initial thunder clouds
+  for (let i = 0; i < 1; i++) {
+    if (Math.random() < 0.3) {
+      createNewThunderCloudAhead();
+    }
+  }
   lastCloudSpawn = performance.now();
   lastSmogSpawn = performance.now();
   console.log('Objects spawned, clouds array length:', clouds.length);
@@ -48,11 +70,19 @@ let playerLives = 3;
 let gameOverState = false;
 let invincibleUntil = 0;
 
+// Enable audio function
+export function enableAudio() {
+  console.log('Enabling audio in clouds.js');
+  audioEnabled = true;
+}
+
 // Timed spawn system
 let lastCloudSpawn = performance.now();
 let lastSmogSpawn = performance.now();
+let lastThunderSpawn = performance.now();
 const CLOUD_SPAWN_INTERVAL = 1200; // ms
 const SMOG_SPAWN_INTERVAL = 2600; // ms
+const THUNDER_SPAWN_INTERVAL = 4000; // ms
 
 function showElectricityEffect() {
   // Flash the screen bright yellow and shake
@@ -113,7 +143,7 @@ function updateLivesDisplay() {
     livesDiv.style.left = '50%';
     livesDiv.style.transform = 'translateX(-50%)';
     livesDiv.style.zIndex = '200';
-    livesDiv.style.fontSize = '28px';
+    livesDiv.style.fontSize = '48px';
     livesDiv.style.color = 'red';
     livesDiv.style.fontWeight = 'bold';
     document.body.appendChild(livesDiv);
@@ -138,8 +168,16 @@ export function loseLife() {
   updateLivesDisplay();
   if (playerLives <= 0) {
     gameOverState = true;
+    // Play game over sound
+    if (audioEnabled) {
+      gameOverSound.currentTime = 0;
+      gameOverSound.volume = 0.8;
+      gameOverSound.play().catch(error => {
+        console.log('Could not play game over sound:', error);
+      });
+    }
     setTimeout(() => {
-      alert('Game Over! You lost all your lives.');
+      alert('Game Over! Score: ' + getScore());
       window.location.reload();
     }, 100);
   }
@@ -158,33 +196,57 @@ export function updateClouds() {
     }
   }
 
-  // Update smog clouds
+  // Update smog clouds (dark grey, visual distortion only)
   for (let i = smogClouds.length - 1; i >= 0; i--) {
     const smog = smogClouds[i];
     smog.position.z += cloudSpeed * getGameSpeed();
-    // Collision detection: if bird is inside smog cloud, trigger lightning strike
-    const birdPos = getBirdPosition && getBirdPosition();
-    if (birdPos && !gameOverState) {
-      const now = performance.now();
-      if (now > invincibleUntil) {
-        const smogWorldPos = new THREE.Vector3();
-        smog.getWorldPosition(smogWorldPos);
-        const dist = smogWorldPos.distanceTo(birdPos);
-        // Make hitbox a bit larger for testing
-        const lightningRadius = 11 * smog.scale.x;
-        if (dist < lightningRadius) {
-          showLightningWarning();
-          showElectricityEffect();
-          loseLife();
-        }
-      }
-    }
     if (smog.position.z > 50) {
       scene.remove(smog);
       smogClouds.splice(i, 1);
     }
   }
-  // Timed spawning for clouds and smog clouds
+
+  // Update thunder clouds (black, lightning strikes)
+  for (let i = thunderClouds.length - 1; i >= 0; i--) {
+    const thunder = thunderClouds[i];
+    thunder.position.z += cloudSpeed * getGameSpeed();
+    // Collision detection: if bird is inside thunder cloud, trigger lightning strike
+    const birdPos = getBirdPosition && getBirdPosition();
+    if (birdPos && !gameOverState) {
+      const now = performance.now();
+      if (now > invincibleUntil) {
+        const thunderWorldPos = new THREE.Vector3();
+        thunder.getWorldPosition(thunderWorldPos);
+        const dist = thunderWorldPos.distanceTo(birdPos);
+        // Make hitbox a bit larger for testing
+        const lightningRadius = 11 * thunder.scale.x;
+        if (dist < lightningRadius) {
+          showLightningWarning();
+          showElectricityEffect();
+          // Play thunder sound
+          console.log('Thunder collision detected! audioEnabled:', audioEnabled);
+          if (audioEnabled) {
+            console.log('Playing thunder sound...');
+            thunderSound.currentTime = 0;
+            thunderSound.volume = 0.7;
+            thunderSound.play().then(() => {
+              console.log('Thunder sound played successfully');
+            }).catch(error => {
+              console.log('Could not play thunder sound:', error);
+            });
+          } else {
+            console.log('Audio not enabled - thunder sound not played');
+          }
+          loseLife();
+        }
+      }
+    }
+    if (thunder.position.z > 50) {
+      scene.remove(thunder);
+      thunderClouds.splice(i, 1);
+    }
+  }
+  // Timed spawning for clouds, smog clouds, and thunder clouds
   const now = performance.now();
   if (isConnected) {
     if (now - lastCloudSpawn > CLOUD_SPAWN_INTERVAL) {
@@ -194,6 +256,10 @@ export function updateClouds() {
     if (now - lastSmogSpawn > SMOG_SPAWN_INTERVAL) {
       createNewSmogCloudAhead();
       lastSmogSpawn = now;
+    }
+    if (now - lastThunderSpawn > THUNDER_SPAWN_INTERVAL) {
+      createNewThunderCloudAhead();
+      lastThunderSpawn = now;
     }
   }
 }
@@ -269,7 +335,7 @@ function createNewBackgroundJetAhead() {
     
     backgroundJet.position.set(
       (Math.random() - 0.5) * 100, // Narrower X range for middle of screen
-      Math.random() * 30 + 5, // Narrower Y range targeting middle (5 to 35)
+      Math.random() * 20 + 5, // Lower max height for better visibility (5 to 25)
       -Math.random() * 200 - 400
     );
     
@@ -336,7 +402,7 @@ function createNewSmogCloudAhead() {
     const sphereSize = Math.random() * 4 + 3;
     const smogGeometry = new THREE.SphereGeometry(sphereSize, 8, 6);
     const smogMaterial = new THREE.MeshLambertMaterial({
-      color: 0x404040, // Dark gray
+      color: 0x808080, // Lighter grey (more visible, less threatening)
       transparent: true,
       opacity: Math.random() * 0.3 + 0.6 // More opaque than regular clouds
     });
@@ -352,16 +418,8 @@ function createNewSmogCloudAhead() {
   }
 
 
-  // Attach a lightning bolt as a child (if loaded)
+  // Mark as smog for detection (no lightning bolt)
   smogGroup.userData.isSmog = true;
-  if (lightningModel) {
-    const bolt = lightningModel.clone();
-    bolt.position.set(0, 0, 0);
-    bolt.scale.setScalar(4 + Math.random() * 2);
-    bolt.userData.isLightning = true;
-    smogGroup.add(bolt);
-    smogGroup.userData.bolt = bolt;
-  }
 
   // Position smog clouds at bird's current height
   const birdPos = getBirdPosition && getBirdPosition();
@@ -380,6 +438,54 @@ function createNewSmogCloudAhead() {
   smogClouds.push(smogGroup);
 }
 
-// No more lightning shooting logic; lightning is static inside smog clouds
+function createNewThunderCloudAhead() {
+  const thunderGroup = new THREE.Group();
 
-// No more lightning bolt animation; handled as part of smog cloud
+  // Create a darker, denser cloud structure (black)
+  const numSpheres = Math.floor(Math.random() * 8) + 6;
+  for (let i = 0; i < numSpheres; i++) {
+    const sphereSize = Math.random() * 4 + 3;
+    const thunderGeometry = new THREE.SphereGeometry(sphereSize, 8, 6);
+    const thunderMaterial = new THREE.MeshLambertMaterial({
+      color: 0x101010, // Even darker - very close to black
+      transparent: true,
+      opacity: Math.random() * 0.3 + 0.7 // More opaque than smog clouds
+    });
+    const thunderSphere = new THREE.Mesh(thunderGeometry, thunderMaterial);
+
+    thunderSphere.position.set(
+      (Math.random() - 0.5) * 12,
+      (Math.random() - 0.5) * 6,
+      (Math.random() - 0.5) * 8
+    );
+
+    thunderGroup.add(thunderSphere);
+  }
+
+  // Attach a lightning bolt as a child (if loaded) - only bottom half
+  thunderGroup.userData.isThunder = true;
+  if (lightningModel) {
+    const bolt = lightningModel.clone();
+    bolt.position.set(0, -12, 0); // Move down further to show only bottom portion
+    bolt.scale.setScalar(4 + Math.random() * 2);
+    bolt.userData.isLightning = true;
+    thunderGroup.add(bolt);
+    thunderGroup.userData.bolt = bolt;
+  }
+
+  // Position thunder clouds at bird's current height
+  const birdPos = getBirdPosition && getBirdPosition();
+  const playerZ = birdPos ? birdPos.z : 0;
+  const playerY = birdPos ? birdPos.y : (Math.random() * 40 - 30);
+  thunderGroup.position.set(
+    (Math.random() - 0.5) * 350,
+    playerY + (Math.random() - 0.5) * 10, // Centered on bird, with some random offset
+    playerZ - 120 - Math.random() * 80 // 120-200 units behind player
+  );
+
+  const scale = Math.random() * 1.5 + 1.2;
+  thunderGroup.scale.set(scale, scale, scale);
+
+  scene.add(thunderGroup);
+  thunderClouds.push(thunderGroup);
+}

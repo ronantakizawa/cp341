@@ -2,6 +2,7 @@ GLB
 https://sketchfab.com/3d-models/white-eagle-animation-fast-fly-30203bf39e5145f19c79e83c550139d3
 https://sketchfab.com/3d-models/mountain-range-01-6dff907d427f4c9f8d301075f8019c82
 https://sketchfab.com/3d-models/f-15-stolmtd-fe22f6f146994c8c8eb8a11f10ec2536
+https://sketchfab.com/3d-models/lightning-bolt-from-poly-by-google-2dd17f8295d04d4c833e685dc4e06618#download
 
 
 
@@ -11,4 +12,6 @@ MP3
 https://pixabay.com/sound-effects/jet-fly-306434/
 https://pixabay.com/sound-effects/classic-game-action-positive-5-224402/
 https://pixabay.com/sound-effects/game-over-arcade-6435/
+https://pixabay.com/sound-effects/thunder-sound-45992/
+
 
