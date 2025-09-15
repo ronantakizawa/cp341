@@ -204,7 +204,6 @@ export function checkJetCollisions() {
     }
   }
 
-    // Building collisions removed (city streaming not used)
 }
 
 function incrementScore() {
