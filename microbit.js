@@ -1,11 +1,15 @@
-import { updateBirdRotation } from './bird.js';
+import { updateBirdRotation, adjustHeight } from './bird.js';
 import { isPaused } from './main.js';
+import { enableAudio } from './collisions.js';
 
 let port, reader;
 export let isConnected = false;
 let smoothedRoll = 0;
 let smoothedPitch = 0;
 const smoothingFactor = 0.2;
+let lastTouchState = 0;
+let touchActionTime = 0;
+const touchCooldown = 200; // 200ms cooldown between touch actions
 
 export async function connectMicrobit() {
   try {
@@ -80,19 +84,37 @@ function parseAngleData(dataString) {
 
   try {
     const parts = dataString.split(',');
-    if (parts.length === 2) {
+    if (parts.length === 3) {
       const roll = parseFloat(parts[0]);
       const pitch = parseFloat(parts[1]);
+      const touch = parseInt(parts[2]);
 
-      if (!isNaN(roll) && !isNaN(pitch)) {
+      if (!isNaN(roll) && !isNaN(pitch) && !isNaN(touch)) {
         smoothedRoll = smoothedRoll + smoothingFactor * (roll - smoothedRoll);
         smoothedPitch = smoothedPitch + smoothingFactor * (pitch - smoothedPitch);
 
         updateBirdRotation(smoothedRoll, smoothedPitch);
+
+        // Handle touch input for height control
+        processTouchInput(touch);
       }
     }
   } catch (error) {
     console.log('Parse error:', error);
+  }
+}
+
+function processTouchInput(touchState) {
+  const currentTime = Date.now();
+
+  // Only process touch changes with cooldown
+  if (touchState !== lastTouchState && currentTime - touchActionTime > touchCooldown) {
+    if (touchState === 1) { // Touch detected (foil touching GND)
+      enableAudio();
+      adjustHeight(1); // Go up when touching
+      touchActionTime = currentTime;
+    }
+    lastTouchState = touchState;
   }
 }
 

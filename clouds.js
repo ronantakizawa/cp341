@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
+import { getGameSpeed } from './main.js';
 
 export let clouds = [];
 export let smogClouds = [];
@@ -34,7 +35,7 @@ export function updateClouds() {
   // Update regular clouds
   for (let i = clouds.length - 1; i >= 0; i--) {
     const cloud = clouds[i];
-    cloud.position.z += cloudSpeed;
+    cloud.position.z += cloudSpeed * getGameSpeed();
 
     if (cloud.position.z > 50) {
       scene.remove(cloud);
@@ -47,7 +48,7 @@ export function updateClouds() {
   // Update smog clouds
   for (let i = smogClouds.length - 1; i >= 0; i--) {
     const smog = smogClouds[i];
-    smog.position.z += cloudSpeed;
+    smog.position.z += cloudSpeed * getGameSpeed();
 
     if (smog.position.z > 50) {
       scene.remove(smog);

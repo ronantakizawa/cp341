@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
+import { getGameSpeed } from './main.js';
 
 // Container to allow whole mountain environment to be swapped out
 export const mountainGroup = new THREE.Group();
@@ -69,7 +70,7 @@ function createMountainFromCache(zPosition = null) {
 export function updateMountains() {
   for (let i = mountains.length - 1; i >= 0; i--) {
     const mountain = mountains[i];
-    mountain.position.z += mountainSpeed;
+    mountain.position.z += mountainSpeed * getGameSpeed();
     
     if (mountain.position.z > 500) {
       scene.remove(mountain);

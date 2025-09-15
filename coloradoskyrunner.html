@@ -66,26 +66,6 @@
         font-weight: bold;
       }
       
-      #camera {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        z-index: 100;
-        width: 160px;
-        height: 120px;
-        border: 2px solid white;
-        background: black;
-      }
-      
-      #cameraStatus {
-        position: absolute;
-        bottom: 150px;
-        right: 20px;
-        z-index: 100;
-        color: white;
-        font-size: 12px;
-        text-align: right;
-      }
       
     </style>
   </head>
@@ -99,19 +79,13 @@
         <div style="color: white; margin-top: 10px; font-size: 12px;">
           Tilt sideways to move sideways<br>
           Tilt forwards to move forwards<br>
-          Hand gestures:<br>
-          👍 Thumbs UP = Bird goes up | 👎 Thumbs DOWN = Bird goes down
+          Touch foil sensor to go up<br>
+          Say "faster" or "slower" to change speed
         </div>
       </div>
-      <video id="camera" autoplay muted></video>
-      <div id="cameraStatus">Camera: Off</div>
     </div>
     
     
-    <!-- MediaPipe Hands for gesture detection -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     
     <script type="importmap">
       {
