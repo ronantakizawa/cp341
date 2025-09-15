@@ -40,7 +40,7 @@ export function loadBird() {
     const scale = config.scale || 2.0;
     bird.scale.set(scale, scale, scale);
 
-    bird.position.set(-30, -20, 0);
+    bird.position.set(-30, -20, -15);
     bird.rotation.y = Math.PI / 2;
 
     bird.traverse(function(child) {
@@ -72,12 +72,19 @@ export function updateBirdRotation(roll, pitch) {
     const pitchSensitivity = 2.0;
     const baseXOffset = -40; // recenter after narrowing lanes
     const maxHorizontal = 170; // reduced from 220 to match new city lane spread
+    const minZ = -120; // Minimum Z position (closer to camera)
+    const maxZ = 0; // Maximum Z position (further from camera)
 
     let targetX = roll * rollSensitivity + baseXOffset;
     if (targetX > maxHorizontal) targetX = maxHorizontal;
     if (targetX < -maxHorizontal) targetX = -maxHorizontal;
     bird.position.x = targetX;
-    bird.position.z = -pitch * pitchSensitivity;
+
+    let targetZ = -pitch * pitchSensitivity;
+    if (targetZ > maxZ) targetZ = maxZ;
+    if (targetZ < minZ) targetZ = minZ;
+    bird.position.z = targetZ;
+
     bird.position.y = currentHeight; // Use current height instead of fixed -25
 
     bird.rotation.y = Math.PI / 2;

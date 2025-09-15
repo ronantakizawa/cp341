@@ -14,7 +14,7 @@ const touchCooldown = 200; // 200ms cooldown between touch actions
 export async function connectMicrobit() {
   try {
     port = await navigator.serial.requestPort();
-    await port.open({ 
+    await port.open({
       baudRate: 115200,
       bufferSize: 64
     });
@@ -58,7 +58,7 @@ async function readSerialData() {
     while (isConnected) {
       const { value, done } = await reader.read();
       if (done) break;
-      
+
       const lines = value.split('\n');
       for (const line of lines) {
         const trimmedLine = line.trim();
@@ -71,7 +71,7 @@ async function readSerialData() {
     console.error('Reading error:', error);
     isConnected = false;
     updateStatus('Connection lost');
-    
+
     document.getElementById('logo').style.display = 'block';
   }
 }
