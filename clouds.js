@@ -105,6 +105,10 @@ function showElectricityEffect() {
 function showLightningWarning() {
   if (lightningWarningShown) return;
   lightningWarningShown = true;
+
+  // Pause the game
+  import('./main.js').then(m => m.pauseGame());
+
   // Create notification element
   const notification = document.createElement('div');
   notification.style.cssText = `
@@ -130,6 +134,8 @@ function showLightningWarning() {
   document.body.appendChild(notification);
   setTimeout(() => {
     notification.remove();
+    // Resume the game after notification is removed
+    import('./main.js').then(m => m.resumeGame());
   }, 3500);
 }
 
@@ -210,35 +216,39 @@ export function updateClouds() {
   for (let i = thunderClouds.length - 1; i >= 0; i--) {
     const thunder = thunderClouds[i];
     thunder.position.z += cloudSpeed * getGameSpeed();
-    // Collision detection: if bird is inside thunder cloud, trigger lightning strike
+    // Proximity and collision detection for thunder clouds
     const birdPos = getBirdPosition && getBirdPosition();
     if (birdPos && !gameOverState) {
       const now = performance.now();
-      if (now > invincibleUntil) {
-        const thunderWorldPos = new THREE.Vector3();
-        thunder.getWorldPosition(thunderWorldPos);
-        const dist = thunderWorldPos.distanceTo(birdPos);
-        // Make hitbox a bit larger for testing
-        const lightningRadius = 11 * thunder.scale.x;
-        if (dist < lightningRadius) {
-          showLightningWarning();
-          showElectricityEffect();
-          // Play thunder sound
-          console.log('Thunder collision detected! audioEnabled:', audioEnabled);
-          if (audioEnabled) {
-            console.log('Playing thunder sound...');
-            thunderSound.currentTime = 0;
-            thunderSound.volume = 0.7;
-            thunderSound.play().then(() => {
-              console.log('Thunder sound played successfully');
-            }).catch(error => {
-              console.log('Could not play thunder sound:', error);
-            });
-          } else {
-            console.log('Audio not enabled - thunder sound not played');
-          }
-          loseLife();
+      const thunderWorldPos = new THREE.Vector3();
+      thunder.getWorldPosition(thunderWorldPos);
+      const dist = thunderWorldPos.distanceTo(birdPos);
+
+      // Warning range - show notification when near (larger radius)
+      const warningRadius = 25 * thunder.scale.x;
+      if (dist < warningRadius) {
+        showLightningWarning();
+      }
+
+      // Collision range - lightning strike when very close (smaller radius)
+      const lightningRadius = 11 * thunder.scale.x;
+      if (now > invincibleUntil && dist < lightningRadius) {
+        showElectricityEffect();
+        // Play thunder sound
+        console.log('Thunder collision detected! audioEnabled:', audioEnabled);
+        if (audioEnabled) {
+          console.log('Playing thunder sound...');
+          thunderSound.currentTime = 0;
+          thunderSound.volume = 0.7;
+          thunderSound.play().then(() => {
+            console.log('Thunder sound played successfully');
+          }).catch(error => {
+            console.log('Could not play thunder sound:', error);
+          });
+        } else {
+          console.log('Audio not enabled - thunder sound not played');
         }
+        loseLife();
       }
     }
     if (thunder.position.z > 50) {
