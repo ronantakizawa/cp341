@@ -1,7 +1,8 @@
 ## Colorado Sky Runner ##
 ## Owen - Ronan - Nate ##
 
-<img width="757" height="296" alt="logo" src="https://github.com/user-attachments/assets/af92becd-e44b-443e-af54-464a9bae1bd0" />
+<img width="1500" height="814" alt="Screenshot 2025-09-15 at 11 23 00 AM" src="https://github.com/user-attachments/assets/48486455-3b3f-4f6a-9dc7-d87a7867fc4d" />
+
 
 ## Install Instrcutions
 - Clone Repo
