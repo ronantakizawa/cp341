@@ -29,7 +29,6 @@ export function initVoiceRecognition() {
       const lastResult = event.results[event.results.length - 1];
       if (lastResult.isFinal) {
         const command = lastResult[0].transcript.toLowerCase().trim();
-        console.log('Voice command received:', command);
         processVoiceCommand(command);
       }
     };
@@ -75,7 +74,6 @@ export function startVoiceListening() {
     isListening = true;
     recognition.start();
     updateVoiceStatus('Voice: Listening...');
-    console.log('Voice recognition started');
   } catch (error) {
     console.log('Error starting voice recognition:', error);
     updateVoiceStatus('Voice: Error starting');

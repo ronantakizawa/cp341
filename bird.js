@@ -71,7 +71,7 @@ export function updateBirdRotation(roll, pitch) {
     const rollSensitivity = 3.2; // slightly reduced for narrower field
     const pitchSensitivity = 2.0;
     const baseXOffset = -40; // recenter after narrowing lanes
-    const maxHorizontal = 220; 
+    const maxHorizontal = 170; // reduced from 220 to match new city lane spread
     const minZ = -120; // Minimum Z position (closer to camera)
     const maxZ = 0; // Maximum Z position (further from camera)
 
