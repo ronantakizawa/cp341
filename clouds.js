@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
+import { getBirdPosition } from './bird.js';
 import { isConnected } from './microbit.js';
 import { getGameSpeed } from './main.js';
 
@@ -9,28 +10,142 @@ export let smogClouds = [];
 const cloudSpeed = 1.5;
 const maxClouds = 20;
 
+// Lightning bolt system
+let lightningModel = null;
+const activeLightningBolts = [];
+const LIGHTNING_SPEED = 14; // much faster
+const LIGHTNING_LIFETIME = 1.2; // shorter lifetime
+const LIGHTNING_COOLDOWN = 1.5; // min seconds between bolts per cloud
+
+// Preload lightning.glb once
+const lightningLoader = new GLTFLoader();
+lightningLoader.load('./lightning.glb', function(gltf) {
+  lightningModel = gltf.scene;
+}, undefined, function(error) {
+  console.error('Error loading lightning.glb:', error);
+});
+
 // Start spawning objects when MicroBit connects
 export function startObjectSpawning() {
   console.log('Starting object spawning, isConnected:', isConnected);
-  // Create initial objects ahead when game starts
+  // Create a few initial objects ahead when game starts
   for (let i = 0; i < 3; i++) {
-    createNewGoldenHoopAhead(); // Force create hoops
+    createNewGoldenHoopAhead();
   }
-  if (Math.random() < 0.3) { // 30% chance to spawn a jet initially
+  if (Math.random() < 0.3) {
     createNewBackgroundJetAhead();
   }
-  // Spawn some initial smog clouds
   for (let i = 0; i < 2; i++) {
-    if (Math.random() < 0.4) {
-      createNewSmogCloudAhead();
-    }
+    createNewSmogCloudAhead();
   }
+  lastCloudSpawn = performance.now();
+  lastSmogSpawn = performance.now();
   console.log('Objects spawned, clouds array length:', clouds.length);
 }
 
+let lightningWarningShown = false;
+let playerLives = 3;
+let gameOverState = false;
+let invincibleUntil = 0;
 
+// Timed spawn system
+let lastCloudSpawn = performance.now();
+let lastSmogSpawn = performance.now();
+const CLOUD_SPAWN_INTERVAL = 1200; // ms
+const SMOG_SPAWN_INTERVAL = 2600; // ms
 
+function showElectricityEffect() {
+  // Flash the screen bright yellow and shake
+  const flash = document.createElement('div');
+  flash.style.cssText = `
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(255,255,0,0.85);
+    z-index: 2000;
+    pointer-events: none;
+    transition: opacity 0.2s;`;
+  document.body.appendChild(flash);
+  setTimeout(() => {
+    flash.style.opacity = '0';
+    setTimeout(() => flash.remove(), 200);
+  }, 120);
+  import('./scene.js').then(m => m.startCameraShake(2.5, 0.6));
+}
 
+function showLightningWarning() {
+  if (lightningWarningShown) return;
+  lightningWarningShown = true;
+  // Create notification element
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 68, 68, 0.95);
+    color: white;
+    padding: 40px;
+    border-radius: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    max-width: 600px;
+    min-width: 500px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    line-height: 1.4;
+  `;
+  notification.textContent =
+    'Extreme weather events, made worse by climate change, can disorient and endanger birds.\n\nLightning, hail, and storms are a growing threat to bird migration and survival.';
+  document.body.appendChild(notification);
+  setTimeout(() => {
+    notification.remove();
+  }, 3500);
+}
+
+function updateLivesDisplay() {
+  let livesDiv = document.getElementById('lives');
+  if (!livesDiv) {
+    livesDiv = document.createElement('div');
+    livesDiv.id = 'lives';
+    livesDiv.style.position = 'absolute';
+    livesDiv.style.top = '20px';
+    livesDiv.style.left = '50%';
+    livesDiv.style.transform = 'translateX(-50%)';
+    livesDiv.style.zIndex = '200';
+    livesDiv.style.fontSize = '28px';
+    livesDiv.style.color = 'red';
+    livesDiv.style.fontWeight = 'bold';
+    document.body.appendChild(livesDiv);
+  }
+  livesDiv.innerHTML = '❤'.repeat(playerLives) + '♡'.repeat(3 - playerLives);
+}
+
+// Initialize lives display on script load
+if (typeof window !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    updateLivesDisplay();
+  });
+}
+// Also call updateLivesDisplay immediately in case DOMContentLoaded already fired
+updateLivesDisplay();
+
+export function loseLife() {
+  if (gameOverState) return;
+  // Add invincibility for 1.2 seconds after hit
+  invincibleUntil = performance.now() + 1200;
+  playerLives--;
+  updateLivesDisplay();
+  if (playerLives <= 0) {
+    gameOverState = true;
+    setTimeout(() => {
+      alert('Game Over! You lost all your lives.');
+      window.location.reload();
+    }, 100);
+  }
+}
+
+// Patch collision in updateClouds
 export function updateClouds() {
   // Update regular clouds
   for (let i = clouds.length - 1; i >= 0; i--) {
@@ -40,8 +155,6 @@ export function updateClouds() {
     if (cloud.position.z > 50) {
       scene.remove(cloud);
       clouds.splice(i, 1);
-
-      createNewCloudAhead();
     }
   }
 
@@ -49,27 +162,38 @@ export function updateClouds() {
   for (let i = smogClouds.length - 1; i >= 0; i--) {
     const smog = smogClouds[i];
     smog.position.z += cloudSpeed * getGameSpeed();
-
+    // Collision detection: if bird is inside smog cloud, trigger lightning strike
+    const birdPos = getBirdPosition && getBirdPosition();
+    if (birdPos && !gameOverState) {
+      const now = performance.now();
+      if (now > invincibleUntil) {
+        const smogWorldPos = new THREE.Vector3();
+        smog.getWorldPosition(smogWorldPos);
+        const dist = smogWorldPos.distanceTo(birdPos);
+        // Make hitbox a bit larger for testing
+        const lightningRadius = 11 * smog.scale.x;
+        if (dist < lightningRadius) {
+          showLightningWarning();
+          showElectricityEffect();
+          loseLife();
+        }
+      }
+    }
     if (smog.position.z > 50) {
       scene.remove(smog);
       smogClouds.splice(i, 1);
-
-      // Occasionally spawn new smog clouds
-      if (Math.random() < 0.3) {
-        createNewSmogCloudAhead();
-      }
     }
   }
-  
-  // Ensure minimum number of objects are always spawning ahead
-  if (isConnected && clouds.length < 5) {
-    console.log('Spawning more objects, current count:', clouds.length);
-    for (let i = clouds.length; i < 5; i++) {
-      if (Math.random() < 0.9) {
-        createNewGoldenHoopAhead();
-      } else {
-        createNewBackgroundJetAhead();
-      }
+  // Timed spawning for clouds and smog clouds
+  const now = performance.now();
+  if (isConnected) {
+    if (now - lastCloudSpawn > CLOUD_SPAWN_INTERVAL) {
+      createNewCloudAhead();
+      lastCloudSpawn = now;
+    }
+    if (now - lastSmogSpawn > SMOG_SPAWN_INTERVAL) {
+      createNewSmogCloudAhead();
+      lastSmogSpawn = now;
     }
   }
 }
@@ -93,7 +217,8 @@ function createNewCloudAhead() {
     return;
   }
 
-  if (Math.random() < 0.2) {
+  // Reduce smog cloud spawn rate to make game easier
+  if (Math.random() < 0.08) {
     createNewSmogCloudAhead();
     return;
   }
@@ -154,6 +279,8 @@ function createNewBackgroundJetAhead() {
     
     // Mark as jet for collision detection
     backgroundJet.userData.isJet = true;
+    // Mark as NOT a cloud for sound logic
+    backgroundJet.userData.isCloud = false;
     
     backgroundJet.traverse(function(child) {
       if (child.isMesh) {
@@ -224,14 +351,26 @@ function createNewSmogCloudAhead() {
     smogGroup.add(smogSphere);
   }
 
-  // Mark as smog for detection
-  smogGroup.userData.isSmog = true;
 
-  // Position smog clouds at lower altitudes (more likely near ground pollution)
+  // Attach a lightning bolt as a child (if loaded)
+  smogGroup.userData.isSmog = true;
+  if (lightningModel) {
+    const bolt = lightningModel.clone();
+    bolt.position.set(0, 0, 0);
+    bolt.scale.setScalar(4 + Math.random() * 2);
+    bolt.userData.isLightning = true;
+    smogGroup.add(bolt);
+    smogGroup.userData.bolt = bolt;
+  }
+
+  // Position smog clouds at bird's current height
+  const birdPos = getBirdPosition && getBirdPosition();
+  const playerZ = birdPos ? birdPos.z : 0;
+  const playerY = birdPos ? birdPos.y : (Math.random() * 40 - 30);
   smogGroup.position.set(
     (Math.random() - 0.5) * 350,
-    Math.random() * 40 - 30, // Lower altitude range
-    -Math.random() * 200 - 300
+    playerY + (Math.random() - 0.5) * 10, // Centered on bird, with some random offset
+    playerZ - 120 - Math.random() * 80 // 120-200 units behind player
   );
 
   const scale = Math.random() * 1.5 + 1.2;
@@ -240,3 +379,7 @@ function createNewSmogCloudAhead() {
   scene.add(smogGroup);
   smogClouds.push(smogGroup);
 }
+
+// No more lightning shooting logic; lightning is static inside smog clouds
+
+// No more lightning bolt animation; handled as part of smog cloud

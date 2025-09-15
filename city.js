@@ -2,9 +2,6 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
 
-// City streaming system: loads city.glb once, extracts building meshes, then
-// spawns rows (chunks) that move toward the camera similar to mountains.
-
 const loader = new GLTFLoader();
 
 let chunkSpeed = 0.75; // Constant speed for simpler mode
