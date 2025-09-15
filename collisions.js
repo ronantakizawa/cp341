@@ -2,7 +2,7 @@ import { getBirdPosition } from './bird.js';
 import { clouds, smogClouds } from './clouds.js';
 import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
-import { startCameraShake } from './scene.js';
+import { startCameraShake, startVisualDistortionEffect } from './scene.js';
 import { pauseGame, resumeGame } from './main.js';
 
 let score = 0;
@@ -345,14 +345,18 @@ export function checkSmogProximity() {
   }
 }
 
-// Play jet interference sound (reusing function name for compatibility)
+// Apply visual distortion and audio effects
 function startVisualDistortion(intensity) {
   // Show notification on first distortion
   if (!firstDistortionShown) {
     showJetWarning();
     firstDistortionShown = true;
   }
-  
+
+  // Apply visual distortion effects
+  startVisualDistortionEffect(intensity, 3.0); // 3 second duration
+
+  // Play audio effects
   if (audioEnabled && intensity > 0.5) { // Only play if significant interference
     jetSound.currentTime = 0;
     jetSound.volume = Math.min(intensity / 2, 0.3); // Scale volume with intensity, max 0.3
