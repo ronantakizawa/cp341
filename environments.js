@@ -11,10 +11,6 @@ export function initEnvironments() {
   registerEnvironmentKeys();
 }
 
-export function updateEnvironments(dt) {
-  // No city update needed
-}
-
 export function getBuildingObstacles() {
   return [];
 }
