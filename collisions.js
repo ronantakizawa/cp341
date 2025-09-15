@@ -4,13 +4,14 @@ import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
 import { startCameraShake, startVisualDistortionEffect } from './scene.js';
 import { pauseGame, resumeGame } from './main.js';
+import { loseLife } from './clouds.js';
 
 let score = 0;
 let audioEnabled = false;
 let firstDistortionShown = false;
 let firstSmogShown = false;
 import * as THREE from 'three';
-import { getBuildingObstacles } from './environments.js';
+
 
 // Create audio objects
 const pointSound = new Audio('./score.mp3');
@@ -197,40 +198,13 @@ export function checkJetCollisions() {
         object.userData.hitByBird = true;
         
         // Log the jet hit
-        console.log('Bird hit a jet! Game Over!');
-        
-        gameOver();
+        console.log('Bird hit a jet!');
+        loseLife();
       }
     }
   }
 
-  // Building collisions (city streaming)
-  const buildings = getBuildingObstacles();
-  if (buildings && buildings.length) {
-    const birdPos = getBirdPosition();
-    if (birdPos) {
-  const birdRadius = 14; // slightly smaller to allow tighter navigation
-      for (const b of buildings) {
-        if (!b.isMesh) continue;
-        // Quick reject if building too far in Z (outside interaction band)
-        const worldZ = b.getWorldPosition(new THREE.Vector3()).z;
-        if (worldZ < birdPos.z - 80 || worldZ > birdPos.z + 120) continue;
-        const box = new THREE.Box3().setFromObject(b);
-        const clampedX = THREE.MathUtils.clamp(birdPos.x, box.min.x, box.max.x);
-        const clampedY = THREE.MathUtils.clamp(birdPos.y, box.min.y, box.max.y);
-        const clampedZ = THREE.MathUtils.clamp(birdPos.z, box.min.z, box.max.z);
-        const dx = birdPos.x - clampedX;
-        const dy = birdPos.y - clampedY;
-        const dz = birdPos.z - clampedZ;
-        if (dx*dx + dy*dy + dz*dz < birdRadius * birdRadius) {
-          console.log('Building collision!');
-          import('./scene.js').then(m => m.startCameraShake(1.2, 0.9));
-          gameOver();
-          break;
-        }
-      }
-    }
-  }
+    // Building collisions removed (city streaming not used)
 }
 
 function incrementScore() {
@@ -256,7 +230,7 @@ function gameOver() {
   }
   
   // Show game over message
-  alert('Game Over! You hit a plane!\n\nFinal Score: ' + score);
+  alert('Game Over! You lost all your lives.\n\nFinal Score: ' + score);
   
   // Reload the page after a short delay to let the sound play
   setTimeout(() => {
