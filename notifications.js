@@ -79,20 +79,6 @@ export function showLightningWarning() {
   });
 }
 
-// Function to show electricity effect (lightning flash)
-export function showElectricityEffect() {
-  // Flash the screen bright yellow and shake
-  const flash = document.createElement('div');
-  flash.style.cssText = CSS_STYLES.lightningFlash;
-  document.body.appendChild(flash);
-  setTimeout(() => {
-    flash.style.opacity = '0';
-    setTimeout(() => flash.remove(), 200);
-  }, 120);
-
-  // Import scene functions and trigger camera shake
-  import('./scene.js').then(m => m.startCameraShake(2.5, 0.6));
-}
 
 // State management functions
 export function getFirstDistortionShown() {
