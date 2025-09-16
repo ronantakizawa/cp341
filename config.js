@@ -51,5 +51,6 @@ export const CSS_STYLES = {
 export const NOTIFICATION_MESSAGES = {
   lightning: 'Extreme weather events, made worse by climate change, can disorient and endanger birds.\n\nLightning, hail, and storms are a growing threat to bird migration and survival.',
   jet: 'Jets can distract the flight of birds, causing them to lose balance, temperament, and sight',
-  smog: 'Smog and human air pollution can affect bird\'s breathing and vision'
+  smog: 'Smog and human air pollution can affect bird\'s breathing and vision',
+  about: 'Did you know that the bird population in the United States has declined by nearly 3 billion since 1970? That\'s a loss of about 29% of all birds! Habitat loss, climate change, and pollution are major factors. This game aims to raise awareness about the importance of protecting America\'s birds by showing the harmful conditions endured by birds every day'
 };

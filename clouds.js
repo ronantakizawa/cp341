@@ -70,10 +70,8 @@ export function enableAudio() {
 // Timed spawn system
 let lastCloudSpawn = performance.now();
 let lastSmogSpawn = performance.now();
-let lastThunderSpawn = performance.now();
 const CLOUD_SPAWN_INTERVAL = 1200; // ms
 const SMOG_SPAWN_INTERVAL = 2600; // ms
-const THUNDER_SPAWN_INTERVAL = 8000; // ms
 
 
 
@@ -135,10 +133,6 @@ export function updateClouds() {
       createNewSmogCloudAhead();
       lastSmogSpawn = now;
     }
-    if (now - lastThunderSpawn > THUNDER_SPAWN_INTERVAL) {
-      createNewThunderCloudAhead();
-      lastThunderSpawn = now;
-    }
   }
 }
 
@@ -156,7 +150,7 @@ function createNewCloudAhead() {
     return;
   }
 
-  if (Math.random() < 0.1) {
+  if (Math.random() < 0.25) {
     createNewBackgroundJetAhead();
     return;
   }
@@ -166,7 +160,14 @@ function createNewCloudAhead() {
     createNewSmogCloudAhead();
     return;
   }
-  
+
+  // Thunder clouds - low probability for balance
+  if (Math.random() < 0.05) {
+    createNewThunderCloudAhead();
+    return;
+  }
+
+  // Default: create regular cloud
   const cloudGroup = new THREE.Group();
   
   const numSpheres = Math.floor(Math.random() * 5) + 4;
