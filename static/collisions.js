@@ -13,10 +13,10 @@ let audioEnabled = false;
 
 
 // Create audio objects
-const pointSound = new Audio('./score.mp3');
-const gameOverSound = new Audio('./gameover.mp3');
-const jetSound = new Audio('./jet.mp3');
-const thunderSound = new Audio('./thunder.mp3');
+const pointSound = new Audio('/static/score.mp3');
+const gameOverSound = new Audio('/static/gameover.mp3');
+const jetSound = new Audio('/static/jet.mp3');
+const thunderSound = new Audio('/static/thunder.mp3');
 
 
 

@@ -16,7 +16,7 @@ let mountainModel = null;
 export function createMountainField() {
   const loader = new GLTFLoader();
   
-  loader.load('./mountain.glb', function(gltf) {
+  loader.load('/static/mountain.glb', function(gltf) {
     mountainModel = gltf.scene;
     
     mountainModel.traverse(function(child) {

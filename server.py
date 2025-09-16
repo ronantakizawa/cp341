@@ -1,7 +1,7 @@
-from flask import Flask, send_file, send_from_directory
+from flask import Flask, render_template, send_from_directory
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
 
 # Get the directory where this script is located
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -9,12 +9,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 @app.route('/')
 def index():
     """Serve the main HTML file"""
-    return send_file(os.path.join(BASE_DIR, 'coloradoskyrunner.html'))
+    return render_template('coloradoskyrunner.html')
 
-@app.route('/<path:filename>')
-def serve_files(filename):
+@app.route('/static/<path:filename>')
+def serve_static(filename):
     """Serve static files (JS, CSS, images, audio, models, etc.)"""
-    return send_from_directory(BASE_DIR, filename)
+    return send_from_directory('static', filename)
 
 if __name__ == '__main__':
     print(f"Serving files from: {BASE_DIR}")
