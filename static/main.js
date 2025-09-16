@@ -39,6 +39,7 @@ async function init() {
     notification.style.cssText = CSS_STYLES.notification;
     notification.textContent = NOTIFICATION_MESSAGES.about;
 
+
     const exitButton = document.createElement('button');
     exitButton.textContent = 'X';
     exitButton.style.cssText = CSS_STYLES.xButton;
@@ -56,6 +57,10 @@ async function init() {
   });
   
   
+
+    // Add to page
+    document.body.appendChild(notification);
+
   animate();
 }
 
