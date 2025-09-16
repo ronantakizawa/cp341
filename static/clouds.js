@@ -54,8 +54,8 @@ export function startObjectSpawning() {
       createNewThunderCloudAhead();
     }
   }
-  lastCloudSpawn = performance.now();
-  lastSmogSpawn = performance.now();
+  totalDistance = 0;
+  lastSpawnDistance = 0;
 }
 
 
@@ -65,11 +65,10 @@ export function enableAudio() {
   audioEnabled = true;
 }
 
-// Timed spawn system
-let lastCloudSpawn = performance.now();
-let lastSmogSpawn = performance.now();
-const CLOUD_SPAWN_INTERVAL = 1200; // ms
-const SMOG_SPAWN_INTERVAL = 2600; // ms
+// Distance-based spawn system
+let totalDistance = 0;
+let lastSpawnDistance = 0;
+const SPAWN_DISTANCE = 100; // units between spawns
 
 
 
@@ -120,16 +119,18 @@ export function updateClouds() {
       thunderClouds.splice(i, 1);
     }
   }
-  // Timed spawning for clouds, smog clouds, and thunder clouds
-  const now = performance.now();
+  // Distance-based spawning with randomness
   if (isConnected) {
-    if (now - lastCloudSpawn > CLOUD_SPAWN_INTERVAL) {
-      createNewCloudAhead();
-      lastCloudSpawn = now;
-    }
-    if (now - lastSmogSpawn > SMOG_SPAWN_INTERVAL) {
-      createNewSmogCloudAhead();
-      lastSmogSpawn = now;
+    // Accumulate distance based on game speed (simulates forward movement)
+    totalDistance += cloudSpeed * getGameSpeed();
+
+    // Check if we've traveled enough distance to spawn
+    if (totalDistance - lastSpawnDistance > SPAWN_DISTANCE) {
+      // Random chance to spawn something at this distance
+      if (Math.random() < 0.7) { // 70% chance to spawn something
+        createNewCloudAhead();
+      }
+      lastSpawnDistance = totalDistance;
     }
   }
 }
@@ -142,7 +143,7 @@ function createNewCloudAhead() {
   }
   
   
-  if (Math.random() < 0.45) {
+  if (Math.random() < 0.25) {
     createNewGoldenHoopAhead();
     return;
   }
@@ -159,7 +160,7 @@ function createNewCloudAhead() {
   }
 
   // Thunder clouds - increased probability
-  if (Math.random() < 0.10) {
+  if (Math.random() < 0.25) {
     createNewThunderCloudAhead();
     return;
   }
