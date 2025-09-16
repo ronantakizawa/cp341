@@ -145,7 +145,7 @@ function createNewCloudAhead() {
   
   console.log('Creating new object ahead');
   
-  if (Math.random() < 0.35) {
+  if (Math.random() < 0.45) {
     createNewGoldenHoopAhead();
     return;
   }
@@ -161,8 +161,8 @@ function createNewCloudAhead() {
     return;
   }
 
-  // Thunder clouds - low probability for balance
-  if (Math.random() < 0.05) {
+  // Thunder clouds - increased probability
+  if (Math.random() < 0.10) {
     createNewThunderCloudAhead();
     return;
   }
