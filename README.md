@@ -3,45 +3,90 @@
 
 <img width="1500" height="814" alt="Screenshot 2025-09-15 at 11 23 00 AM" src="https://github.com/user-attachments/assets/48486455-3b3f-4f6a-9dc7-d87a7867fc4d" />
 
+## Overview ##
 
-## Install Instrcutions
-- Clone Repo
-- Install all assets in assets.txt
-- Run server.py
+Colorado Sky Runner is an educational 3D flying game where you control a bird navigating the skies of Colorado Rockies! The game highlights real-world environmental and social justice challenges faced by birds, such as air pollution, wildfires, habitat loss, and climate change. Players use a BBC Micro:Bit-BirdController (and voice controls) to steer, avoid obstacles, and learn about conservation issues through interactive gameplay.
 
-Overview:
-Colorado Sky Runner is a custom input prototype for a bird-themed game. The project explores how embodied controls (glove-mounted Micro:bits) can simulate a day in the life of an endangered bird species in an engaging and socially impactful way. Inspired by the game StarFox, our game emphasizes bird conservation and migration themes, blending fun gameplay with meaningful and educational context.
-At this stage in our project, the main focus is on the controller rather than the full game. The glove-mounted Micro:bits provide tilt feedback through the accelerometer, radio signals to communicate with the game, and a rough visual game design will demonstrate how these inputs affect the birds movement and gameplay.
+---
 
-Current Features:
-- Glove-Mounted Micro:bit
-- Wrist tilt controls banking left/right.
-- Forward/backward tilt maps to climbing/diving.
-- Flapping motion with arms  = flap / ascend.
-- Arms down/gliding motion = dive / descend.
+### Features ##
 
-Basic Screen Mock:
-- Displays a bird icon that responds to tilt and visual input. Moving through 3D space avoids obstacles etc…
+- **3D Flight Simulation:** Fly a bird through a dynamically generated Colorado Rockies landscape using Three.js.
+- **Micro:Bit Integration:** Control the bird’s movement with a real Micro:Bit accelerometer and touch sensors
+- **AI Voice Commands:** Adjust game speed/difficulty using your voice.
+- **Environmental Hazards:** Encounter smog, thunderclouds, jets, and more — each representing real threats to birds.
+- **Educational Messaging:** Game over screens and in-game messages inform and teach about Colorado’s environmental challenges -- links to conservation resources and donations.
+- **Sound Effects:** Audio feedback for scoring, hazards, and game events.
+- **Replayability:** Randomized obstacles, scalable difficulty, and restart buttton.
 
-Planned Features:
-- Vision-based input (using webcam + AI recognition)
-- Detects the flapping gestures, facial expressions, or posture to trigger special actions.
+---
 
-Setup (Prototype Stage):
+## Setup Instructions ##
 
-Wear the glove controllers:
-- Attach a Micro:bit to each glove and power them with their batteries.
+#### 1. **Requirements**
 
-Connect the receiver Micro:bit\:
-- Plug a third Micro:bit into your computer via USB.
-- This Micro:bit listens for radio signals from the glove controllers.
+- **Flask** (for running a local server)
+- **Python 3** (for Micro:Bit serial communication)
+- **BBC Micro:Bit** (for motion controls)
+- **Bird Controller** (for moving the bird up and down/gliding) 
+- **Modern Web Browser** (Chrome recommended for Web Speech API support)
 
-Run the prototype program:
-- Launch the screen mock on your computer.
-- The bird icon should respond to glove tilt and flapping motions.
+---
 
-Test controls:
-- Tilt wrists left/right = bank the bird.
-- Tilt forward/backward = climb/dive.
-- Flap arms = ascend.
-- Glide arms down = descend.
+#### 2. **Assets Needed**
+
+Place these files in the `/cp341` directory:
+- coloradoskyrunner.html (main HTML file)
+- main.js, scene.js, bird.js, clouds.js, mountains.js, collisions.js, microbit.js, voice.js, environments.js
+- microbit.py (for Micro:Bit, flashed to the device)
+- `/assets/` folder containing:
+  - bird.glb (3D bird model)
+  - mountain.glb (3D mountain model)
+  - thunder.mp3, gameover.mp3, score.mp3, jet.mp3 (audio files)
+  - logo.png (game logo)
+  - Any other 3D models or audio referenced in the code
+ 
+---
+
+#### 3. **Running the Game**
+
+**Using Flask (Recommended for Local Development)**
+- Install Flask (if you haven’t already) in your project folder:
+-     python3 -m venv venv
+-     source venv/bin/activate
+-     pip install Flask
+- Run the server:
+-     python3 server.py
+- Open your browser and go to:
+-     http://localhost:5001
+
+---
+
+### How to Play ##
+
+- **Start the Game:** Click "Connect MicroBit" to begin -- connect your MicroBit
+- **Controls:**
+  - **Bird Controller/MicroBit:** Tilt to steer, and connect/tap the birds wings together to flap/up/glide.
+  - **Voice:** Say "faster" or "slower", to change the birds speeds/game difficulty
+- **Objective:** Fly as far as possible, avoid obstacles, and collect points.
+- **Obstacles:** Smog clouds, thunderclouds, jets, and mountains.
+- **Game Over:** Colliding with hazards ends the game and displays an environmental message with links to bird conservation resources.
+- **Replay:** Click "Play Again" on the game over screen.
+
+---
+
+### Social Justice & Environmental Education ##
+
+Colorado Sky Runner is designed to raise awareness about:
+- Air pollution and its impact on wildlife
+- Wildfires and habitat destruction
+- Climate change and migration disruption
+- The importance of conservation efforts
+
+---
+
+### Troubleshooting ##
+
+- **Speech Recognition Not Working:** Use Chrome and allow microphone access.
+- **Micro:Bit Not Connecting:** Ensure drivers are installed and use a supported browser.
+- **Missing Assets:** Check the `/assets/` folder for all required files.
