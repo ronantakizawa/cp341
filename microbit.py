@@ -12,11 +12,11 @@ smoothing_factor = 0.3  # Higher = more responsive, lower = more stable
 
 while True:
     # --------- Accelerometer readings ---------
-    raw_x = accelerometer.get_x()  # Roll
-    raw_y = accelerometer.get_y()  # Pitch
-    raw_z = accelerometer.get_z()  # Up/down
+    raw_x = accelerometer.get_x()
+    raw_y = accelerometer.get_y()
+    raw_z = accelerometer.get_z()
 
-    # Exponential smoothing to reduce noise
+    # Exponential smoothing
     smooth_x = smooth_x + smoothing_factor * (raw_x - smooth_x)
     smooth_y = smooth_y + smoothing_factor * (raw_y - smooth_y)
     smooth_z = smooth_z + smoothing_factor * (raw_z - smooth_z)
@@ -29,10 +29,16 @@ while True:
     roll = math.degrees(math.atan2(x, math.sqrt(y*y + z*z)))
     pitch = math.degrees(math.atan2(-y, math.sqrt(x*x + z*z)))
 
-    # 0 when touching, 1 when not
-    touch = 1 if pin0.read_digital() == 0 else 0
+    # --------- Foil touch sensor ---------
+    if pin0.read_digital() == 0:
+        touch = 1
+        display.show(Image.HAPPY)   # show smiley when touching
+    else:
+        touch = 0
+        display.clear()              # clear screen when not touching
 
-
+    # --------- Output combined data ---------
+    # Format: roll,pitch,touch
     print("{:.1f},{:.1f},{}".format(roll, pitch, touch))
 
-    sleep(50)  # 20 Hz update
+    sleep(50)
