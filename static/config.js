@@ -20,7 +20,25 @@ export const CSS_STYLES = {
     box-shadow: 0 8px 40px rgba(0,0,0,0.7);
     line-height: 1.4;
   `,
-
+  
+  //button to close about pop up
+  xButton:`
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(255, 68, 68, 0.95);
+    color: white;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    width: 25px;
+    height: 25px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    line-height: 1.4;
+    `,
+  
   // Lightning flash effect
   lightningFlash: `
     position: fixed;

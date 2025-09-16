@@ -39,17 +39,28 @@ async function init() {
     notification.style.cssText = CSS_STYLES.notification;
     notification.textContent = NOTIFICATION_MESSAGES.about;
 
-    // Add to page
-    document.body.appendChild(notification);
 
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
+    const exitButton = document.createElement('button');
+    exitButton.textContent = 'X';
+    exitButton.style.cssText = CSS_STYLES.xButton;
+
+    exitButton.onclick = () => {
       if (notification.parentNode) {
         notification.parentNode.removeChild(notification);
       }
-    }, 5000);
+      resumeGame();
+    } 
+    // Add to page
+    notification.appendChild(exitButton);
+    document.body.appendChild(notification);
+    
   });
   
+  
+
+    // Add to page
+    document.body.appendChild(notification);
+
   animate();
 }
 
