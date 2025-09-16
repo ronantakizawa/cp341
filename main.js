@@ -52,20 +52,39 @@ async function init() {
         line-height: 1.4;
       `;
       notification.textContent = 'Did you know that the bird population in the United States has declined by nearly 3 billion since 1970?'
-        + ' That\'s a loss of about 29% of all birds! Habitat loss, climate change, and pollution are major factors.' 
+        + ' That\'s a loss of about 29% of all birds! Habitat loss, climate change, and pollution are all major factors.' 
         + ' This game aims to raise awareness about the importance of protecting America\'s birds by'
         + ' showing the harmful conditions endured by birds every day';
-    
-      // Add to page
-      document.body.appendChild(notification);
-    
-      // Auto-remove after 3 seconds and resume game
-      setTimeout(() => {
+
+      const exitButton = document.createElement('button');
+      exitButton.textContent = 'X';
+      exitButton.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(255, 68, 68, 0.95);
+        color: white;
+        border-radius: 7px;
+        font-size: 12px;
+        font-weight: bold;
+        text-align: center;
+        z-index: 1000;
+        width: 25px;
+        height: 25px;
+        box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+        line-height: 1.4;
+        `;
+
+      exitButton.onclick = () => {
         if (notification.parentNode) {
           notification.parentNode.removeChild(notification);
         }
         resumeGame();
-      }, 3000);
+      } 
+      // Add to page
+      notification.appendChild(exitButton);
+      document.body.appendChild(notification);
+      
     });
   
   // Keep arrow key event listeners as backup controls
