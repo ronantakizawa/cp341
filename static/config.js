@@ -63,6 +63,51 @@ export const CSS_STYLES = {
     z-index: 2000;
     pointer-events: none;
     transition: opacity 0.2s;
+  `,
+
+  // Game over screen styling
+  gameOverScreen: `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(220, 53, 69, 0.95);
+    color: white;
+    padding: 40px;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    max-width: 600px;
+    min-width: 500px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    line-height: 1.6;
+  `,
+
+  // Restart button styling
+  restartButton: `
+    background: #4caf50;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-right: 15px;
+  `,
+
+  // Learn more button styling
+  learnMoreButton: `
+    background: #2196f3;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
   `
 };
 

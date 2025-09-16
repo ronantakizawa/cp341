@@ -58,21 +58,10 @@ export function loseLife() {
   updateLivesDisplay();
   if (playerLives <= 0) {
     gameOverState = true;
-    // Import audio functionality and play game over sound
+    // Use the new game over screen from collisions.js
     import('./collisions.js').then(module => {
-      if (module.isAudioEnabled && module.isAudioEnabled()) {
-        const gameOverSound = new Audio('/static/gameover.mp3');
-        gameOverSound.currentTime = 0;
-        gameOverSound.volume = 0.8;
-        gameOverSound.play().catch(error => {
-          console.log('Could not play game over sound:', error);
-        });
-      }
+      module.gameOver();
     });
-    setTimeout(() => {
-      alert('Game Over! Score: ' + getScore());
-      window.location.reload();
-    }, 100);
   }
 }
 

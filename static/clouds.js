@@ -189,7 +189,7 @@ function createNewCloudAhead() {
   
   cloudGroup.position.set(
     (Math.random() - 0.5) * 400,
-    Math.random() * 75 - 25,
+    Math.random() * 50 - 40,
     -Math.random() * 200 - 400
   );
   
@@ -211,7 +211,7 @@ function createNewBackgroundJetAhead() {
     
     backgroundJet.position.set(
       (Math.random() - 0.5) * 100, // Narrower X range for middle of screen
-      Math.random() * 20 - 5, // Lower min height for better visibility (-5 to 15)
+      Math.random() * 30 - 40, // Much lower height (-40 to -10)
       -Math.random() * 200 - 400
     );
     
@@ -256,7 +256,7 @@ function createNewGoldenHoopAhead() {
   // Position new hoops far ahead
   hoop.position.set(
     (Math.random() - 0.5) * 200,
-    Math.random() * 75 - 25,
+    Math.random() * 50 - 40,
     -Math.random() * 200 - 200  // Far ahead
   );
   
@@ -300,7 +300,7 @@ function createNewSmogCloudAhead() {
   // Position smog clouds at bird's current height
   const birdPos = getBirdPosition && getBirdPosition();
   const playerZ = birdPos ? birdPos.z : 0;
-  const playerY = birdPos ? birdPos.y : (Math.random() * 40 - 30);
+  const playerY = birdPos ? birdPos.y : (Math.random() * 50 - 40);
   smogGroup.position.set(
     (Math.random() - 0.5) * 350,
     playerY + (Math.random() - 0.5) * 10, // Centered on bird, with some random offset
@@ -352,7 +352,7 @@ function createNewThunderCloudAhead() {
   // Position thunder clouds far ahead like other objects
   thunderGroup.position.set(
     (Math.random() - 0.5) * 200,
-    Math.random() * 75 - 25,
+    Math.random() * 50 - 40,
     -Math.random() * 200 - 200  // Far ahead
   );
 

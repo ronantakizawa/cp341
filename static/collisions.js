@@ -246,22 +246,73 @@ export function checkThunderProximity() {
   }
 }
 
-function gameOver() {
+export function gameOver() {
+  // Pause the game
+  pauseGame();
+
   // Play game over sound if audio is enabled
   if (audioEnabled) {
     gameOverSound.currentTime = 0;
+    gameOverSound.volume = 0.8;
     gameOverSound.play().catch(error => {
       console.log('Could not play game over sound:', error);
     });
   }
-  
-  // Show game over message
-  alert('Game Over! Score: ' + getScore());
-  
-  // Reload the page after a short delay to let the sound play
-  setTimeout(() => {
+
+  // Create game over screen
+  const gameOverScreen = document.createElement('div');
+  gameOverScreen.style.cssText = CSS_STYLES.gameOverScreen;
+
+  gameOverScreen.innerHTML = `
+    <div style="font-size: 32px; margin-bottom: 20px; color: #ffebee;">
+      🕊️ GAME OVER 🕊️
+    </div>
+
+    <div style="font-size: 24px; margin-bottom: 20px; color: #ffcdd2;">
+      Final Score: ${getScore()}
+    </div>
+
+    <div style="font-size: 16px; margin-bottom: 25px; line-height: 1.8;">
+      <strong>Environmental Reality:</strong><br>
+      Colorado's birds face real challenges daily:<br>
+      • Air pollution from cities and wildfires<br>
+      • Habitat loss from rapid development<br>
+      • Climate change & urbanization disrupting migration patterns<br>
+      • Light pollution confusing nocturnal birds
+    </div>
+
+    <div style="margin-bottom: 25px;">
+      <strong>Make a difference for Colorado's birds:</strong><br>
+      <a href="https://www.birdconservancy.org/donate/" target="_blank"
+         style="color: #81c784; text-decoration: underline; font-size: 16px;">
+        Donate to Bird Conservancy of the Rockies →
+      </a>
+    </div>
+
+    <button id="restartGame">
+      🔄 Play Again
+    </button>
+
+    <button id="learnMore">
+      🌱 Learn More
+    </button>
+  `;
+
+  // Add to page
+  document.body.appendChild(gameOverScreen);
+
+  // Apply button styling from config
+  document.getElementById('restartGame').style.cssText = CSS_STYLES.restartButton;
+  document.getElementById('learnMore').style.cssText = CSS_STYLES.learnMoreButton;
+
+  // Add button event listeners
+  document.getElementById('restartGame').addEventListener('click', () => {
     window.location.reload();
-  }, 500);
+  });
+
+  document.getElementById('learnMore').addEventListener('click', () => {
+    window.open('https://www.birdconservancy.org/', '_blank');
+  });
 }
 
 export function checkJetProximity() {
