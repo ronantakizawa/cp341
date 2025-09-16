@@ -4,7 +4,7 @@ import { scene } from './scene.js';
 import { getBirdPosition } from './bird.js';
 import { isConnected } from './microbit.js';
 import { getGameSpeed } from './main.js';
-import { getScore } from './collisions.js';
+import { getScore, gameOver } from './collisions.js';
 
 export let clouds = [];
 export let smogClouds = [];
@@ -174,18 +174,8 @@ export function loseLife() {
   updateLivesDisplay();
   if (playerLives <= 0) {
     gameOverState = true;
-    // Play game over sound
-    if (audioEnabled) {
-      gameOverSound.currentTime = 0;
-      gameOverSound.volume = 0.8;
-      gameOverSound.play().catch(error => {
-        console.log('Could not play game over sound:', error);
-      });
-    }
-    setTimeout(() => {
-      alert('Game Over! Score: ' + getScore());
-      window.location.reload();
-    }, 100);
+    // Use the new game over screen from collisions.js
+    gameOver();
   }
 }
 

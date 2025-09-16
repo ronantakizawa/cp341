@@ -219,7 +219,10 @@ function incrementScore() {
   }
 }
 
-function gameOver() {
+export function gameOver() {
+  // Pause the game
+  pauseGame();
+  
   // Play game over sound if audio is enabled
   if (audioEnabled) {
     gameOverSound.currentTime = 0;
@@ -228,13 +231,92 @@ function gameOver() {
     });
   }
   
-  // Show game over message
-  alert('Game Over! Score: ' + score);
+  // Create game over screen
+  const gameOverScreen = document.createElement('div');
+  gameOverScreen.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(220, 53, 69, 0.95);
+    color: white;
+    padding: 40px;
+    border-radius: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 1000;
+    max-width: 600px;
+    min-width: 500px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+    line-height: 1.6;
+  `;
   
-  // Reload the page after a short delay to let the sound play
-  setTimeout(() => {
+  gameOverScreen.innerHTML = `
+    <div style="font-size: 32px; margin-bottom: 20px; color: #ffebee;">
+      🕊️ GAME OVER 🕊️
+    </div>
+    
+    <div style="font-size: 24px; margin-bottom: 20px; color: #ffcdd2;">
+      Final Score: ${score}
+    </div>
+    
+    <div style="font-size: 16px; margin-bottom: 25px; line-height: 1.8;">
+      <strong>Environmental Reality:</strong><br>
+      Colorado's birds face real challenges daily:<br>
+      • Air pollution from cities and wildfires<br>
+      • Habitat loss from rapid development<br>
+      • Climate change & urbanization disrupting migration patterns<br>
+      • Light pollution confusing nocturnal birds
+    </div>
+    
+    <div style="margin-bottom: 25px;">
+      <strong>Make a difference for Colorado's birds:</strong><br>
+      <a href="https://www.birdconservancy.org/donate/" target="_blank" 
+         style="color: #81c784; text-decoration: underline; font-size: 16px;">
+        Donate to Bird Conservancy of the Rockies →
+      </a>
+    </div>
+    
+    <button id="restartGame" style="
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-right: 15px;
+    ">
+      🔄 Play Again
+    </button>
+    
+    <button id="learnMore" style="
+      background: #2196f3;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+    ">
+      🌱 Learn More
+    </button>
+  `;
+  
+  // Add to page
+  document.body.appendChild(gameOverScreen);
+  
+  // Add button event listeners
+  document.getElementById('restartGame').addEventListener('click', () => {
     window.location.reload();
-  }, 500);
+  });
+  
+  document.getElementById('learnMore').addEventListener('click', () => {
+    window.open('https://www.birdconservancy.org/', '_blank');
+  });
 }
 
 export function checkJetProximity() {
