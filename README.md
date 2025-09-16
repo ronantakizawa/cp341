@@ -1,7 +1,7 @@
 ## Colorado Sky Runner ##
 ## Owen - Ronan - Nate ##
 
-<img width="1500" height="814" alt="Screenshot 2025-09-15 at 11 23 00 AM" src="https://github.com/user-attachments/assets/48486455-3b3f-4f6a-9dc7-d87a7867fc4d" />
+<img width="1391" height="671" alt="Screenshot 2025-09-16 at 11 43 12 AM" src="https://github.com/user-attachments/assets/f7a9cf2c-4bae-41cb-b3ea-476aab5cefd5" />
 
 ## Overview ##
 
@@ -78,8 +78,8 @@ Place these files in the `/cp341` directory:
 ### Social Justice & Environmental Education ##
 
 Colorado Sky Runner is designed to raise awareness about:
-- Air pollution and its impact on wildlife
-- Wildfires and habitat destruction
+- Air pollution and its impact on birds and wildlife
+- Wildfires and habitat destruction to birds
 - Climate change and migration disruption
 - The importance of conservation efforts
 
