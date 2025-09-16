@@ -68,7 +68,7 @@ export function loadBird() {
 
 export function updateBirdRotation(roll, pitch) {
   if (bird) {
-    const rollSensitivity = 3.2; // slightly reduced for narrower field
+    const rollSensitivity = 3.2; 
     const pitchSensitivity = 2.0;
     const baseXOffset = -40; // recenter after narrowing lanes
     const maxHorizontal = 170; // reduced from 220 to match new city lane spread
