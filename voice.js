@@ -10,7 +10,6 @@ export function initVoiceRecognition() {
     // Check if Web Speech API is supported
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       console.log('Speech recognition not supported in this browser');
-      updateVoiceStatus('Voice: Not supported');
       return false;
     }
 
@@ -36,13 +35,6 @@ export function initVoiceRecognition() {
     // Handle recognition errors
     recognition.onerror = function(event) {
       console.log('Speech recognition error:', event.error);
-      if (event.error === 'not-allowed') {
-        updateVoiceStatus('Voice: Permission denied');
-      } else if (event.error === 'no-speech') {
-        // This is normal, don't show error
-      } else {
-        updateVoiceStatus('Voice: Error');
-      }
     };
 
     // Handle recognition end
@@ -57,12 +49,11 @@ export function initVoiceRecognition() {
       }
     };
 
-    updateVoiceStatus('Voice: Ready');
+
     return true;
 
   } catch (error) {
     console.error('Error initializing voice recognition:', error);
-    updateVoiceStatus('Voice: Error');
     return false;
   }
 }
@@ -73,10 +64,8 @@ export function startVoiceListening() {
   try {
     isListening = true;
     recognition.start();
-    updateVoiceStatus('Voice: Listening...');
   } catch (error) {
     console.log('Error starting voice recognition:', error);
-    updateVoiceStatus('Voice: Error starting');
   }
 }
 
@@ -85,8 +74,6 @@ export function stopVoiceListening() {
 
   isListening = false;
   recognition.stop();
-  updateVoiceStatus('Voice: Stopped');
-  console.log('Voice recognition stopped');
 }
 
 function processVoiceCommand(command) {
@@ -95,24 +82,15 @@ function processVoiceCommand(command) {
     return;
   }
 
-  // Only process commands if microbit is connected
-  if (!isConnected) {
-    updateVoiceStatus('Voice: Connect MicroBit first!');
-    return;
-  }
 
   // Enable audio on first voice command
   enableAudio();
 
   // Process speed commands
-  if (command.includes('faster') || command.includes('speed up') || command.includes('fast')) {
+  if (command.includes('faster')) {
     adjustGameSpeed(1);
-    updateVoiceStatus(`Voice: Speed ${getGameSpeed()}x`);
-    console.log('Voice command: Speed up');
-  } else if (command.includes('slower') || command.includes('slow down') || command.includes('slow')) {
+  } else if (command.includes('slower')) {
     adjustGameSpeed(-1);
-    updateVoiceStatus(`Voice: Speed ${getGameSpeed()}x`);
-    console.log('Voice command: Slow down');
   } else if (command.includes('normal') || command.includes('reset')) {
     // Reset to normal speed
     while (getGameSpeed() !== 1.0) {
@@ -122,27 +100,9 @@ function processVoiceCommand(command) {
         adjustGameSpeed(1);
       }
     }
-    updateVoiceStatus(`Voice: Speed ${getGameSpeed()}x`);
-    console.log('Voice command: Normal speed');
   } else {
     // Unrecognized command
-    updateVoiceStatus('Voice: Say "faster" or "slower"');
     setTimeout(() => {
-      if (isListening) {
-        updateVoiceStatus('Voice: Listening...');
-      }
     }, 2000);
   }
-}
-
-function updateVoiceStatus(status) {
-  // Voice status could be displayed elsewhere if needed
-  console.log(status);
-}
-
-export function getVoiceStatus() {
-  return {
-    isListening,
-    isSupported: recognition !== null
-  };
 }

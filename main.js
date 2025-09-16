@@ -88,15 +88,6 @@ async function init() {
       
     });
   
-  // Keep arrow key event listeners as backup controls
-  document.addEventListener('keydown', function(event) {
-    // Enable audio on first keypress
-    enableAudio();
-    enableCloudsAudio(); // Also enable audio for thunder sounds
-
-    // Arrow keys removed - using touch sensor for height
-  });
-  
   animate();
 }
 
