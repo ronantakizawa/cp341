@@ -47,6 +47,11 @@ export function loadBird() {
       if (child.isMesh) {
         child.castShadow = true;
         child.receiveShadow = true;
+        // Darken the original material
+        if (child.material) {
+          child.material = child.material.clone();
+          child.material.color.multiplyScalar(0.1); // Darken by 90%
+        }
       }
     });
     
