@@ -38,7 +38,6 @@ lightningLoader.load('/static/lightning.glb', function(gltf) {
 
 // Start spawning objects when MicroBit connects
 export function startObjectSpawning() {
-  console.log('Starting object spawning, isConnected:', isConnected);
   // Create a few initial objects ahead when game starts
   for (let i = 0; i < 3; i++) {
     createNewGoldenHoopAhead();
@@ -57,7 +56,6 @@ export function startObjectSpawning() {
   }
   lastCloudSpawn = performance.now();
   lastSmogSpawn = performance.now();
-  console.log('Objects spawned, clouds array length:', clouds.length);
 }
 
 
@@ -143,7 +141,6 @@ function createNewCloudAhead() {
     return;
   }
   
-  console.log('Creating new object ahead');
   
   if (Math.random() < 0.45) {
     createNewGoldenHoopAhead();

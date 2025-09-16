@@ -182,8 +182,6 @@ export function checkThunderCollisions() {
       if (boltDistance < 20) {
         thunder.userData.boltHit = true;
 
-        // Log the lightning bolt hit
-        console.log('Bird hit a lightning bolt!');
 
         // Show electricity effect
         showElectricityEffect();

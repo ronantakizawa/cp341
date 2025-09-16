@@ -55,11 +55,6 @@ async function init() {
     document.body.appendChild(notification);
     
   });
-  
-  
-
-    // Add to page
-    document.body.appendChild(notification);
 
   animate();
 }
