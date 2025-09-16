@@ -87,10 +87,12 @@ function processVoiceCommand(command) {
   enableAudio();
 
   // Process speed commands
-  if (command.includes('faster')) {
+  if (command.includes('faster') || command.includes('speed up') || command.includes('fast')) {
     adjustGameSpeed(1);
-  } else if (command.includes('slower')) {
+    console.log('Voice command: Speed up');
+  } else if (command.includes('slower') || command.includes('slow down') || command.includes('slow')) {
     adjustGameSpeed(-1);
+    console.log('Voice command: Slow down');
   } else if (command.includes('normal') || command.includes('reset')) {
     // Reset to normal speed
     while (getGameSpeed() !== 1.0) {
@@ -100,6 +102,7 @@ function processVoiceCommand(command) {
         adjustGameSpeed(1);
       }
     }
+    console.log('Voice command: Normal speed');
   } else {
     // Unrecognized command
     setTimeout(() => {

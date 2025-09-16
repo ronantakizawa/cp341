@@ -5,6 +5,7 @@ import { isConnected } from './microbit.js';
 import { startCameraShake, startVisualDistortionEffect } from './scene.js';
 import { pauseGame, resumeGame } from './main.js';
 import { loseLife } from './clouds.js';
+import { CSS_STYLES } from './config.js';
 
 let score = 0;
 let audioEnabled = false;
@@ -38,24 +39,7 @@ function showJetWarning() {
 
   // Create notification element
   const notification = document.createElement('div');
-  notification.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 68, 68, 0.95);
-    color: white;
-    padding: 40px;
-    border-radius: 15px;
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    z-index: 1000;
-    max-width: 600px;
-    min-width: 500px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
-    line-height: 1.4;
-  `;
+  notification.style.cssText = CSS_STYLES.notification;
   notification.textContent = 'Jets can distract the flight of birds, causing them to lose balance, temperament, and sight';
 
   // Add to page
@@ -77,24 +61,7 @@ function showSmogWarning() {
 
   // Create notification element
   const notification = document.createElement('div');
-  notification.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 68, 68, 0.95);
-    color: white;
-    padding: 40px;
-    border-radius: 15px;
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    z-index: 1000;
-    max-width: 600px;
-    min-width: 500px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
-    line-height: 1.4;
-  `;
+  notification.style.cssText = CSS_STYLES.notification;
   notification.textContent = 'Smog and human air pollution can affect bird\'s breathing and vision';
 
   // Add to page

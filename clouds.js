@@ -5,6 +5,7 @@ import { getBirdPosition } from './bird.js';
 import { isConnected } from './microbit.js';
 import { getGameSpeed } from './main.js';
 import { getScore } from './collisions.js';
+import { CSS_STYLES } from './config.js';
 
 export let clouds = [];
 export let smogClouds = [];
@@ -87,13 +88,7 @@ const THUNDER_SPAWN_INTERVAL = 4000; // ms
 function showElectricityEffect() {
   // Flash the screen bright yellow and shake
   const flash = document.createElement('div');
-  flash.style.cssText = `
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(255,255,0,0.85);
-    z-index: 2000;
-    pointer-events: none;
-    transition: opacity 0.2s;`;
+  flash.style.cssText = CSS_STYLES.lightningFlash;
   document.body.appendChild(flash);
   setTimeout(() => {
     flash.style.opacity = '0';
@@ -111,24 +106,7 @@ function showLightningWarning() {
 
   // Create notification element
   const notification = document.createElement('div');
-  notification.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 68, 68, 0.95);
-    color: white;
-    padding: 40px;
-    border-radius: 15px;
-    font-size: 24px;
-    font-weight: bold;
-    text-align: center;
-    z-index: 1000;
-    max-width: 600px;
-    min-width: 500px;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.7);
-    line-height: 1.4;
-  `;
+  notification.style.cssText = CSS_STYLES.notification;
   notification.textContent =
     'Extreme weather events, made worse by climate change, can disorient and endanger birds.\n\nLightning, hail, and storms are a growing threat to bird migration and survival.';
   document.body.appendChild(notification);

@@ -24,7 +24,6 @@ export async function connectMicrobit() {
     reader = textDecoder.readable.getReader();
     
     isConnected = true;
-    updateStatus('Connected to MicroBit!');
     document.getElementById('startBtn').textContent = 'Disconnect';
     document.getElementById('startBtn').onclick = disconnectMicrobit;
     
@@ -34,7 +33,6 @@ export async function connectMicrobit() {
     
   } catch (error) {
     console.error('Connection failed:', error);
-    updateStatus('Connection failed');
   }
 }
 
@@ -46,7 +44,6 @@ export function disconnectMicrobit() {
     port.close();
   }
   isConnected = false;
-  updateStatus('Disconnected');
   document.getElementById('startBtn').textContent = 'Connect MicroBit';
   document.getElementById('startBtn').onclick = connectMicrobit;
   
@@ -70,7 +67,6 @@ async function readSerialData() {
   } catch (error) {
     console.error('Reading error:', error);
     isConnected = false;
-    updateStatus('Connection lost');
 
     document.getElementById('logo').style.display = 'block';
   }
@@ -116,8 +112,4 @@ function processTouchInput(touchState) {
     }
     lastTouchState = touchState;
   }
-}
-
-function updateStatus(message) {
-  document.getElementById('status').textContent = `Status: ${message}`;
 }

@@ -29,12 +29,10 @@ while True:
     roll = math.degrees(math.atan2(x, math.sqrt(y*y + z*z)))
     pitch = math.degrees(math.atan2(-y, math.sqrt(x*x + z*z)))
 
-    # --------- Foil touch sensor ---------
     # 0 when touching, 1 when not
     touch = 1 if pin0.read_digital() == 0 else 0
 
-    # --------- Output combined data ---------
-    # Format: roll,pitch,touch
+
     print("{:.1f},{:.1f},{}".format(roll, pitch, touch))
 
     sleep(50)  # 20 Hz update
