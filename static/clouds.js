@@ -15,13 +15,13 @@ const cloudSpeed = 1.5;
 let lightningModel = null;
 
 // Thunder sound system
-const thunderSound = new Audio('./thunder.mp3');
+const thunderSound = new Audio('/static/thunder.mp3');
 thunderSound.addEventListener('error', function(e) {
   console.warn('Thunder audio file not found or not supported:', e);
 });
 
 // Game over sound system
-const gameOverSound = new Audio('./gameover.mp3');
+const gameOverSound = new Audio('/static/gameover.mp3');
 gameOverSound.addEventListener('error', function(e) {
   console.warn('Game over audio file not found or not supported:', e);
 });
@@ -30,7 +30,7 @@ let audioEnabled = false;
 
 // Preload lightning.glb once
 const lightningLoader = new GLTFLoader();
-lightningLoader.load('./lightning.glb', function(gltf) {
+lightningLoader.load('/static/lightning.glb', function(gltf) {
   lightningModel = gltf.scene;
 }, undefined, function(error) {
   console.error('Error loading lightning.glb:', error);
@@ -206,7 +206,7 @@ function createNewCloudAhead() {
 function createNewBackgroundJetAhead() {
   const loader = new GLTFLoader();
   
-  loader.load('./jet.glb', function(gltf) {
+  loader.load('/static/jet.glb', function(gltf) {
     const backgroundJet = gltf.scene;
     
     const scale = (Math.random() * 1.5 + 0.5) * 2;

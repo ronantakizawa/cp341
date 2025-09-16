@@ -18,7 +18,7 @@ export function incrementScore() {
   // Import audio functionality from collisions.js
   import('./collisions.js').then(module => {
     if (module.isAudioEnabled && module.isAudioEnabled()) {
-      const pointSound = new Audio('./score.mp3');
+      const pointSound = new Audio('/static/score.mp3');
       pointSound.currentTime = 0;
       pointSound.play().catch(error => {
         console.log('Could not play sound:', error);
@@ -61,7 +61,7 @@ export function loseLife() {
     // Import audio functionality and play game over sound
     import('./collisions.js').then(module => {
       if (module.isAudioEnabled && module.isAudioEnabled()) {
-        const gameOverSound = new Audio('./gameover.mp3');
+        const gameOverSound = new Audio('/static/gameover.mp3');
         gameOverSound.currentTime = 0;
         gameOverSound.volume = 0.8;
         gameOverSound.play().catch(error => {

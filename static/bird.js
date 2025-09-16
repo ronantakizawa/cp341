@@ -17,7 +17,7 @@ const gravity = 0.05; // How fast the bird falls per frame (much weaker)
 let targetHeight = minHeight; // Target height bird is falling towards
 
 const birdConfig = {
-  path: './bird.glb',
+  path: '/static/bird.glb',
   cameraDistance: 50,
   brightness: 1.0,
   scale: 0.8
