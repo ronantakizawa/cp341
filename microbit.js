@@ -1,5 +1,5 @@
 import { updateBirdRotation, adjustHeight } from './bird.js';
-import { isPaused } from './main.js';
+import { isPaused } from './state.js';
 import { enableAudio } from './collisions.js';
 
 let port, reader;

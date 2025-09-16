@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
-import { getGameSpeed } from './main.js';
+import { getGameSpeed } from './state.js';
 
 // Container to allow whole mountain environment to be swapped out
 export const mountainGroup = new THREE.Group();

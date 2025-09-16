@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene, camera } from './scene.js';
-import { getGameSpeed } from './main.js';
+import { getGameSpeed } from './state.js';
 
 export let bird;
 export let mixer;

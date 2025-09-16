@@ -1,6 +1,6 @@
 import { enableAudio } from './collisions.js';
 import { isConnected } from './microbit.js';
-import { isPaused, adjustGameSpeed, getGameSpeed } from './main.js';
+import { isPaused, adjustGameSpeed, getGameSpeed } from './state.js';
 
 let recognition = null;
 let isListening = false;
