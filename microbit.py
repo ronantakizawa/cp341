@@ -30,7 +30,7 @@ while True:
     pitch = math.degrees(math.atan2(-y, math.sqrt(x*x + z*z)))
 
     # --------- Foil touch sensor ---------
-    if pin0.read_digital() == 0:
+    if pin0.read_digital() == 1:
         touch = 1
         display.show(Image.HAPPY)   # show smiley when touching
     else:
