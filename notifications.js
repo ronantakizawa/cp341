@@ -8,7 +8,7 @@ let firstSmogShown = false;
 // Function to show non-blocking jet warning
 export function showJetWarning() {
   // Import game functions dynamically to avoid circular dependencies
-  import('./main.js').then(({ pauseGame, resumeGame }) => {
+  import('./state.js').then(({ pauseGame, resumeGame }) => {
     // Pause the game
     pauseGame();
 
@@ -20,20 +20,20 @@ export function showJetWarning() {
     // Add to page
     document.body.appendChild(notification);
 
-    // Auto-remove after 3 seconds and resume game
+    // Auto-remove after 5 seconds and resume game
     setTimeout(() => {
       if (notification.parentNode) {
         notification.parentNode.removeChild(notification);
       }
       resumeGame();
-    }, 3000);
+    }, 5000);
   });
 }
 
 // Function to show smog warning
 export function showSmogWarning() {
   // Import game functions dynamically to avoid circular dependencies
-  import('./main.js').then(({ pauseGame, resumeGame }) => {
+  import('./state.js').then(({ pauseGame, resumeGame }) => {
     // Pause the game
     pauseGame();
 
@@ -45,13 +45,13 @@ export function showSmogWarning() {
     // Add to page
     document.body.appendChild(notification);
 
-    // Auto-remove after 3 seconds and resume game
+    // Auto-remove after 5 seconds and resume game
     setTimeout(() => {
       if (notification.parentNode) {
         notification.parentNode.removeChild(notification);
       }
       resumeGame();
-    }, 3000);
+    }, 5000);
   });
 }
 
@@ -61,7 +61,7 @@ export function showLightningWarning() {
   lightningWarningShown = true;
 
   // Import game functions dynamically to avoid circular dependencies
-  import('./main.js').then(({ pauseGame, resumeGame }) => {
+  import('./state.js').then(({ pauseGame, resumeGame }) => {
     // Pause the game
     pauseGame();
 
@@ -75,7 +75,7 @@ export function showLightningWarning() {
       notification.remove();
       // Resume the game after notification is removed
       resumeGame();
-    }, 3500);
+    }, 6000);
   });
 }
 

@@ -3,21 +3,16 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
 import { getBirdPosition } from './bird.js';
 import { isConnected } from './microbit.js';
-import { getGameSpeed, getScore, getGameOverState, getInvincibleUntil, loseLife } from './main.js';
-import { showLightningWarning, showElectricityEffect } from './notifications.js';
+import { getGameSpeed, getScore, getGameOverState } from './state.js';
+import { showLightningWarning } from './notifications.js';
 
 export let clouds = [];
 export let smogClouds = [];
 export let thunderClouds = [];
 const cloudSpeed = 1.5;
-const maxClouds = 20;
 
 // Lightning bolt system
 let lightningModel = null;
-const activeLightningBolts = [];
-const LIGHTNING_SPEED = 14; // much faster
-const LIGHTNING_LIFETIME = 1.2; // shorter lifetime
-const LIGHTNING_COOLDOWN = 1.5; // min seconds between bolts per cloud
 
 // Thunder sound system
 const thunderSound = new Audio('./thunder.mp3');
@@ -123,26 +118,6 @@ export function updateClouds() {
         showLightningWarning();
       }
 
-      // Collision range - lightning strike when very close (smaller radius)
-      const lightningRadius = 11 * thunder.scale.x;
-      if (now > getInvincibleUntil() && dist < lightningRadius) {
-        showElectricityEffect();
-        // Play thunder sound
-        console.log('Thunder collision detected! audioEnabled:', audioEnabled);
-        if (audioEnabled) {
-          console.log('Playing thunder sound...');
-          thunderSound.currentTime = 0;
-          thunderSound.volume = 0.7;
-          thunderSound.play().then(() => {
-            console.log('Thunder sound played successfully');
-          }).catch(error => {
-            console.log('Could not play thunder sound:', error);
-          });
-        } else {
-          console.log('Audio not enabled - thunder sound not played');
-        }
-        loseLife();
-      }
     }
     if (thunder.position.z > 50) {
       scene.remove(thunder);
@@ -176,7 +151,7 @@ function createNewCloudAhead() {
   
   console.log('Creating new object ahead');
   
-  if (Math.random() < 0.15) {
+  if (Math.random() < 0.35) {
     createNewGoldenHoopAhead();
     return;
   }
@@ -238,7 +213,7 @@ function createNewBackgroundJetAhead() {
     
     backgroundJet.position.set(
       (Math.random() - 0.5) * 100, // Narrower X range for middle of screen
-      Math.random() * 20 + 5, // Lower max height for better visibility (5 to 25)
+      Math.random() * 20 - 5, // Lower min height for better visibility (-5 to 15)
       -Math.random() * 200 - 400
     );
     

@@ -3,17 +3,19 @@ import { clouds, smogClouds, thunderClouds } from './clouds.js';
 import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
 import { startCameraShake, startVisualDistortionEffect } from './scene.js';
-import { pauseGame, resumeGame, incrementScore, getScore, loseLife } from './main.js';
-import { showJetWarning, showSmogWarning, getFirstDistortionShown, setFirstDistortionShown, getFirstSmogShown, setFirstSmogShown } from './notifications.js';
+import { pauseGame, resumeGame, incrementScore, getScore, loseLife } from './state.js';
+import { showJetWarning, showSmogWarning, showElectricityEffect, getFirstDistortionShown, setFirstDistortionShown, getFirstSmogShown, setFirstSmogShown } from './notifications.js';
+
+import * as THREE from 'three';
 
 let audioEnabled = false;
-import * as THREE from 'three';
 
 
 // Create audio objects
 const pointSound = new Audio('./score.mp3');
 const gameOverSound = new Audio('./gameover.mp3');
 const jetSound = new Audio('./jet.mp3');
+const thunderSound = new Audio('./thunder.mp3');
 
 
 
@@ -21,6 +23,7 @@ const jetSound = new Audio('./jet.mp3');
 pointSound.preload = 'auto';
 gameOverSound.preload = 'auto';
 jetSound.preload = 'auto';
+thunderSound.preload = 'auto';
 
 // Enable audio after first user interaction
 export function enableAudio() {
@@ -73,28 +76,141 @@ export function checkHoopCollisions() {
 export function checkJetCollisions() {
   // Only run collision detection if MicroBit is connected
   if (!isConnected) return;
-  
+
   const birdPos = getBirdPosition();
   if (!birdPos) return;
-  
+
   for (let i = 0; i < clouds.length; i++) {
     const object = clouds[i];
-    
+
     // Check if this is a jet and hasn't been hit yet
     if (object.userData && object.userData.isJet && !object.userData.hitByBird) {
       const distance = birdPos.distanceTo(object.position);
-      
+
       // If bird is too close to jet
       if (distance < 25) {
         object.userData.hitByBird = true;
-        
+
         // Log the jet hit
         console.log('Bird hit a jet!');
         loseLife();
       }
     }
   }
+}
 
+export function checkThunderCollisions() {
+  // Only run collision detection if MicroBit is connected
+  if (!isConnected) return;
+
+  const birdPos = getBirdPosition();
+  if (!birdPos) return;
+
+  for (let i = 0; i < thunderClouds.length; i++) {
+    const thunder = thunderClouds[i];
+
+    // Check if this thunder cloud hasn't been hit yet
+    if (thunder.userData && thunder.userData.isThunder && !thunder.userData.hitByBird) {
+      const distance = birdPos.distanceTo(thunder.position);
+
+      // If bird is too close to thunder cloud (larger collision radius than jets)
+      if (distance < 35) {
+        thunder.userData.hitByBird = true;
+
+        // Log the thunder hit
+        console.log('Bird hit a thunder cloud!');
+
+        // Show electricity effect
+        showElectricityEffect();
+
+        // Play thunder sound
+        if (audioEnabled) {
+          thunderSound.currentTime = 0;
+          thunderSound.volume = 0.7;
+          thunderSound.play().catch(error => {
+            console.log('Could not play thunder sound:', error);
+          });
+        }
+
+        loseLife();
+      }
+    }
+
+    // Also check collision with the lightning bolt if it exists (only if thunder cloud wasn't hit)
+    if (thunder.userData && thunder.userData.bolt && !thunder.userData.boltHit && !thunder.userData.hitByBird) {
+      const bolt = thunder.userData.bolt;
+      const boltWorldPos = new THREE.Vector3();
+      bolt.getWorldPosition(boltWorldPos);
+      const boltDistance = birdPos.distanceTo(boltWorldPos);
+
+      // If bird is too close to lightning bolt (smaller collision radius)
+      if (boltDistance < 20) {
+        thunder.userData.boltHit = true;
+
+        // Log the lightning bolt hit
+        console.log('Bird hit a lightning bolt!');
+
+        // Show electricity effect
+        showElectricityEffect();
+
+        // Play thunder sound
+        if (audioEnabled) {
+          thunderSound.currentTime = 0;
+          thunderSound.volume = 0.7;
+          thunderSound.play().catch(error => {
+            console.log('Could not play thunder sound:', error);
+          });
+        }
+
+        loseLife();
+      }
+    }
+  }
+}
+
+export function checkThunderProximity() {
+  // Only run proximity detection if MicroBit is connected
+  if (!isConnected) return;
+
+  const birdPos = getBirdPosition();
+  if (!birdPos) return;
+
+  let closestThunderDistance = Infinity;
+
+  for (let i = 0; i < thunderClouds.length; i++) {
+    const thunder = thunderClouds[i];
+
+    // Check if this is a thunder cloud
+    if (thunder.userData && thunder.userData.isThunder) {
+      const distance = birdPos.distanceTo(thunder.position);
+
+      if (distance < closestThunderDistance) {
+        closestThunderDistance = distance;
+      }
+    }
+  }
+
+  // Apply thunder effects based on proximity to thunder clouds
+  if (closestThunderDistance < 100) { // Within thunder interference range
+    // Calculate intensity based on distance (closer = more intense)
+    const maxThunderDistance = 100;
+    const minThunderDistance = 35; // Don't play during collision range
+
+    if (closestThunderDistance > minThunderDistance) {
+      // Scale intensity: closer thunder = more intense effects
+      const distanceRatio = (maxThunderDistance - closestThunderDistance) / (maxThunderDistance - minThunderDistance);
+      const intensity = distanceRatio * 0.5; // Lower intensity than jets
+
+      // Play thunder sound with distance-based volume
+      if (audioEnabled && intensity > 0.2) {
+        thunderSound.currentTime = 0;
+        thunderSound.volume = Math.min(intensity * 0.4, 0.3); // Scale volume with intensity, max 0.3
+        thunderSound.play().catch(error => {
+          console.log('Could not play thunder proximity sound:', error);
+        });
+      }
+    }
+  }
 }
 
 function gameOver() {
