@@ -4,7 +4,8 @@ import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
 import { startCameraShake, startVisualDistortionEffect } from './scene.js';
 import { pauseGame, resumeGame, incrementScore, getScore, loseLife } from './state.js';
-import { showJetWarning, showSmogWarning, showElectricityEffect, getFirstDistortionShown, setFirstDistortionShown, getFirstSmogShown, setFirstSmogShown } from './notifications.js';
+import { showJetWarning, showSmogWarning, getFirstDistortionShown, setFirstDistortionShown, getFirstSmogShown, setFirstSmogShown } from './notifications.js';
+import { CSS_STYLES } from './config.js';
 
 import * as THREE from 'three';
 
@@ -41,6 +42,36 @@ export function enableAudio() {
 
 export function isAudioEnabled() {
   return audioEnabled;
+}
+
+// Function to show electricity effect (lightning flash)
+function showElectricityEffect() {
+  // Flash the screen bright yellow and shake
+  const flash = document.createElement('div');
+  flash.style.cssText = CSS_STYLES.lightningFlash;
+  document.body.appendChild(flash);
+  setTimeout(() => {
+    flash.style.opacity = '0';
+    setTimeout(() => flash.remove(), 200);
+  }, 120);
+
+  // Trigger camera shake
+  startCameraShake(2.5, 0.6);
+}
+
+// Function to show jet collision effect (red flash)
+function showJetFlash() {
+  // Flash the screen bright red and shake
+  const flash = document.createElement('div');
+  flash.style.cssText = CSS_STYLES.jetFlash;
+  document.body.appendChild(flash);
+  setTimeout(() => {
+    flash.style.opacity = '0';
+    setTimeout(() => flash.remove(), 200);
+  }, 120);
+
+  // Trigger camera shake
+  startCameraShake(1.5, 0.4);
 }
 
 export function checkHoopCollisions() {
@@ -93,6 +124,10 @@ export function checkJetCollisions() {
 
         // Log the jet hit
         console.log('Bird hit a jet!');
+
+        // Show red flash effect
+        showJetFlash();
+
         loseLife();
       }
     }

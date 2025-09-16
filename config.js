@@ -32,6 +32,19 @@ export const CSS_STYLES = {
     z-index: 2000;
     pointer-events: none;
     transition: opacity 0.2s;
+  `,
+
+  // Jet collision flash effect
+  jetFlash: `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255,0,0,0.85);
+    z-index: 2000;
+    pointer-events: none;
+    transition: opacity 0.2s;
   `
 };
 
