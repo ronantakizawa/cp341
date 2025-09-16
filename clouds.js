@@ -3,9 +3,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { scene } from './scene.js';
 import { getBirdPosition } from './bird.js';
 import { isConnected } from './microbit.js';
-import { getGameSpeed } from './main.js';
-import { getScore } from './collisions.js';
-import { CSS_STYLES } from './config.js';
+import { getGameSpeed, getScore, getGameOverState, getInvincibleUntil, loseLife } from './main.js';
+import { showLightningWarning, showElectricityEffect } from './notifications.js';
 
 export let clouds = [];
 export let smogClouds = [];
@@ -66,10 +65,6 @@ export function startObjectSpawning() {
   console.log('Objects spawned, clouds array length:', clouds.length);
 }
 
-let lightningWarningShown = false;
-let playerLives = 3;
-let gameOverState = false;
-let invincibleUntil = 0;
 
 // Enable audio function
 export function enableAudio() {
@@ -83,89 +78,9 @@ let lastSmogSpawn = performance.now();
 let lastThunderSpawn = performance.now();
 const CLOUD_SPAWN_INTERVAL = 1200; // ms
 const SMOG_SPAWN_INTERVAL = 2600; // ms
-const THUNDER_SPAWN_INTERVAL = 4000; // ms
+const THUNDER_SPAWN_INTERVAL = 8000; // ms
 
-function showElectricityEffect() {
-  // Flash the screen bright yellow and shake
-  const flash = document.createElement('div');
-  flash.style.cssText = CSS_STYLES.lightningFlash;
-  document.body.appendChild(flash);
-  setTimeout(() => {
-    flash.style.opacity = '0';
-    setTimeout(() => flash.remove(), 200);
-  }, 120);
-  import('./scene.js').then(m => m.startCameraShake(2.5, 0.6));
-}
 
-function showLightningWarning() {
-  if (lightningWarningShown) return;
-  lightningWarningShown = true;
-
-  // Pause the game
-  import('./main.js').then(m => m.pauseGame());
-
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.style.cssText = CSS_STYLES.notification;
-  notification.textContent =
-    'Extreme weather events, made worse by climate change, can disorient and endanger birds.\n\nLightning, hail, and storms are a growing threat to bird migration and survival.';
-  document.body.appendChild(notification);
-  setTimeout(() => {
-    notification.remove();
-    // Resume the game after notification is removed
-    import('./main.js').then(m => m.resumeGame());
-  }, 3500);
-}
-
-function updateLivesDisplay() {
-  let livesDiv = document.getElementById('lives');
-  if (!livesDiv) {
-    livesDiv = document.createElement('div');
-    livesDiv.id = 'lives';
-    livesDiv.style.position = 'absolute';
-    livesDiv.style.top = '20px';
-    livesDiv.style.left = '50%';
-    livesDiv.style.transform = 'translateX(-50%)';
-    livesDiv.style.zIndex = '200';
-    livesDiv.style.fontSize = '48px';
-    livesDiv.style.color = 'red';
-    livesDiv.style.fontWeight = 'bold';
-    document.body.appendChild(livesDiv);
-  }
-  livesDiv.innerHTML = '❤'.repeat(playerLives) + '♡'.repeat(3 - playerLives);
-}
-
-// Initialize lives display on script load
-if (typeof window !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', () => {
-    updateLivesDisplay();
-  });
-}
-// Also call updateLivesDisplay immediately in case DOMContentLoaded already fired
-updateLivesDisplay();
-
-export function loseLife() {
-  if (gameOverState) return;
-  // Add invincibility for 1.2 seconds after hit
-  invincibleUntil = performance.now() + 1200;
-  playerLives--;
-  updateLivesDisplay();
-  if (playerLives <= 0) {
-    gameOverState = true;
-    // Play game over sound
-    if (audioEnabled) {
-      gameOverSound.currentTime = 0;
-      gameOverSound.volume = 0.8;
-      gameOverSound.play().catch(error => {
-        console.log('Could not play game over sound:', error);
-      });
-    }
-    setTimeout(() => {
-      alert('Game Over! Score: ' + getScore());
-      window.location.reload();
-    }, 100);
-  }
-}
 
 // Patch collision in updateClouds
 export function updateClouds() {
@@ -196,7 +111,7 @@ export function updateClouds() {
     thunder.position.z += cloudSpeed * getGameSpeed();
     // Proximity and collision detection for thunder clouds
     const birdPos = getBirdPosition && getBirdPosition();
-    if (birdPos && !gameOverState) {
+    if (birdPos && !getGameOverState()) {
       const now = performance.now();
       const thunderWorldPos = new THREE.Vector3();
       thunder.getWorldPosition(thunderWorldPos);
@@ -210,7 +125,7 @@ export function updateClouds() {
 
       // Collision range - lightning strike when very close (smaller radius)
       const lightningRadius = 11 * thunder.scale.x;
-      if (now > invincibleUntil && dist < lightningRadius) {
+      if (now > getInvincibleUntil() && dist < lightningRadius) {
         showElectricityEffect();
         // Play thunder sound
         console.log('Thunder collision detected! audioEnabled:', audioEnabled);
@@ -461,14 +376,11 @@ function createNewThunderCloudAhead() {
     thunderGroup.userData.bolt = bolt;
   }
 
-  // Position thunder clouds at bird's current height
-  const birdPos = getBirdPosition && getBirdPosition();
-  const playerZ = birdPos ? birdPos.z : 0;
-  const playerY = birdPos ? birdPos.y : (Math.random() * 40 - 30);
+  // Position thunder clouds far ahead like other objects
   thunderGroup.position.set(
-    (Math.random() - 0.5) * 350,
-    playerY + (Math.random() - 0.5) * 10, // Centered on bird, with some random offset
-    playerZ - 120 - Math.random() * 80 // 120-200 units behind player
+    (Math.random() - 0.5) * 200,
+    Math.random() * 75 - 25,
+    -Math.random() * 200 - 200  // Far ahead
   );
 
   const scale = Math.random() * 1.5 + 1.2;

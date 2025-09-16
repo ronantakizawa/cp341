@@ -3,14 +3,10 @@ import { clouds, smogClouds, thunderClouds } from './clouds.js';
 import { scene } from './scene.js';
 import { isConnected } from './microbit.js';
 import { startCameraShake, startVisualDistortionEffect } from './scene.js';
-import { pauseGame, resumeGame } from './main.js';
-import { loseLife } from './clouds.js';
-import { CSS_STYLES } from './config.js';
+import { pauseGame, resumeGame, incrementScore, getScore, loseLife } from './main.js';
+import { showJetWarning, showSmogWarning, getFirstDistortionShown, setFirstDistortionShown, getFirstSmogShown, setFirstSmogShown } from './notifications.js';
 
-let score = 0;
 let audioEnabled = false;
-let firstDistortionShown = false;
-let firstSmogShown = false;
 import * as THREE from 'three';
 
 
@@ -19,80 +15,7 @@ const pointSound = new Audio('./score.mp3');
 const gameOverSound = new Audio('./gameover.mp3');
 const jetSound = new Audio('./jet.mp3');
 
-// Set up audio error handling
-pointSound.addEventListener('error', function(e) {
-  console.warn('Score audio file not found or not supported:', e);
-});
 
-gameOverSound.addEventListener('error', function(e) {
-  console.warn('Game over audio file not found or not supported:', e);
-});
-
-jetSound.addEventListener('error', function(e) {
-  console.warn('Jet audio file not found or not supported:', e);
-});
-
-// Function to show non-blocking jet warning
-function showJetWarning() {
-  // Pause the game
-  pauseGame();
-
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.style.cssText = CSS_STYLES.notification;
-  notification.textContent = 'Jets can distract the flight of birds, causing them to lose balance, temperament, and sight';
-
-  // Add to page
-  document.body.appendChild(notification);
-
-  // Auto-remove after 3 seconds and resume game
-  setTimeout(() => {
-    if (notification.parentNode) {
-      notification.parentNode.removeChild(notification);
-    }
-    resumeGame();
-  }, 3000);
-}
-
-// Function to show smog warning
-function showSmogWarning() {
-  // Pause the game
-  pauseGame();
-
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.style.cssText = CSS_STYLES.notification;
-  notification.textContent = 'Smog and human air pollution can affect bird\'s breathing and vision';
-
-  // Add to page
-  document.body.appendChild(notification);
-
-  // Auto-remove after 3 seconds and resume game
-  setTimeout(() => {
-    if (notification.parentNode) {
-      notification.parentNode.removeChild(notification);
-    }
-    resumeGame();
-  }, 3000);
-}
-
-// Handle smog effects
-function startSmogDistortion(intensity) {
-  // Show notification on first smog encounter
-  if (!firstSmogShown) {
-    showSmogWarning();
-    firstSmogShown = true;
-  }
-
-  // Apply visual distortion (reuse existing system)
-  if (audioEnabled && intensity > 0.4) {
-    // Use existing visual distortion system but don't show jet notification
-    const originalFirstDistortionShown = firstDistortionShown;
-    firstDistortionShown = true; // Temporarily prevent jet notification
-    startVisualDistortion(intensity);
-    firstDistortionShown = originalFirstDistortionShown; // Restore original state
-  }
-}
 
 // Preload the audio
 pointSound.preload = 'auto';
@@ -107,11 +30,14 @@ export function enableAudio() {
       pointSound.pause();
       pointSound.currentTime = 0;
       audioEnabled = true;
-      console.log('Audio enabled');
     }).catch(() => {
       console.log('Audio still blocked');
     });
   }
+}
+
+export function isAudioEnabled() {
+  return audioEnabled;
 }
 
 export function checkHoopCollisions() {
@@ -132,8 +58,6 @@ export function checkHoopCollisions() {
       if (distance < 50) {
         object.userData.collected = true;
         
-        // Log the hoop hit
-        console.log('Bird hit a hoop! Score:', score + 1);
         
         // Make hoop disappear completely and play sound
         scene.remove(object);
@@ -173,19 +97,6 @@ export function checkJetCollisions() {
 
 }
 
-function incrementScore() {
-  score++;
-  document.getElementById('score').textContent = `Score: ${score}`;
-  
-  // Play point sound only if audio is enabled
-  if (audioEnabled) {
-    pointSound.currentTime = 0; // Reset to start in case it's already playing
-    pointSound.play().catch(error => {
-      console.log('Could not play sound:', error);
-    });
-  }
-}
-
 function gameOver() {
   // Play game over sound if audio is enabled
   if (audioEnabled) {
@@ -196,7 +107,7 @@ function gameOver() {
   }
   
   // Show game over message
-  alert('Game Over! Score: ' + score);
+  alert('Game Over! Score: ' + getScore());
   
   // Reload the page after a short delay to let the sound play
   setTimeout(() => {
@@ -290,13 +201,13 @@ export function checkSmogProximity() {
 // Apply visual distortion and audio effects for jets
 function startVisualDistortion(intensity) {
   // Show notification on first distortion
-  if (!firstDistortionShown) {
+  if (!getFirstDistortionShown()) {
     showJetWarning();
-    firstDistortionShown = true;
+    setFirstDistortionShown(true);
   }
 
   // Apply visual distortion effects
-  startVisualDistortionEffect(intensity, 3.0); // 3 second duration
+  startVisualDistortionEffect(intensity, 5.0); // 3 second duration
 
   // Play audio effects
   if (audioEnabled && intensity > 0.5) { // Only play if significant interference
@@ -311,15 +222,12 @@ function startVisualDistortion(intensity) {
 // Apply visual distortion effects for smog (no jet sound)
 function startSmogDistortionEffect(intensity) {
   // Show notification on first smog encounter
-  if (!firstSmogShown) {
+  if (!getFirstSmogShown()) {
     showSmogWarning();
-    firstSmogShown = true;
+    setFirstSmogShown(true);
   }
 
   // Apply visual distortion effects only (no sound)
-  startVisualDistortionEffect(intensity, 3.0); // 3 second duration
+  startVisualDistortionEffect(intensity, 2.0); // 3 second duration
 }
 
-export function getScore() {
-  return score;
-}

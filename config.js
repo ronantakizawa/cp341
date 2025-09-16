@@ -1,4 +1,4 @@
-// Configuration file for CSS styles used in notifications and effects
+// Configuration file for CSS styles and notification text
 
 export const CSS_STYLES = {
   // Notification styles for warnings and alerts
@@ -33,4 +33,10 @@ export const CSS_STYLES = {
     pointer-events: none;
     transition: opacity 0.2s;
   `
+};
+
+export const NOTIFICATION_MESSAGES = {
+  lightning: 'Extreme weather events, made worse by climate change, can disorient and endanger birds.\n\nLightning, hail, and storms are a growing threat to bird migration and survival.',
+  jet: 'Jets can distract the flight of birds, causing them to lose balance, temperament, and sight',
+  smog: 'Smog and human air pollution can affect bird\'s breathing and vision'
 };

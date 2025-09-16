@@ -93,6 +93,95 @@ async function init() {
 
 export let isPaused = false;
 
+// Score management
+let score = 0;
+
+export function getScore() {
+  return score;
+}
+
+export function incrementScore() {
+  score++;
+  document.getElementById('score').textContent = `Score: ${score}`;
+
+  // Import audio functionality from collisions.js
+  import('./collisions.js').then(module => {
+    if (module.isAudioEnabled && module.isAudioEnabled()) {
+      const pointSound = new Audio('./score.mp3');
+      pointSound.currentTime = 0;
+      pointSound.play().catch(error => {
+        console.log('Could not play sound:', error);
+      });
+    }
+  });
+}
+
+// Life management
+let playerLives = 3;
+let gameOverState = false;
+let invincibleUntil = 0;
+
+function updateLivesDisplay() {
+  let livesDiv = document.getElementById('lives');
+  if (!livesDiv) {
+    livesDiv = document.createElement('div');
+    livesDiv.id = 'lives';
+    livesDiv.style.position = 'absolute';
+    livesDiv.style.top = '20px';
+    livesDiv.style.left = '50%';
+    livesDiv.style.transform = 'translateX(-50%)';
+    livesDiv.style.zIndex = '200';
+    livesDiv.style.fontSize = '48px';
+    livesDiv.style.color = 'red';
+    livesDiv.style.fontWeight = 'bold';
+    document.body.appendChild(livesDiv);
+  }
+  livesDiv.innerHTML = '❤'.repeat(playerLives) + '♡'.repeat(3 - playerLives);
+}
+
+export function loseLife() {
+  if (gameOverState) return;
+  // Add invincibility for 1.2 seconds after hit
+  invincibleUntil = performance.now() + 1200;
+  playerLives--;
+  updateLivesDisplay();
+  if (playerLives <= 0) {
+    gameOverState = true;
+    // Import audio functionality and play game over sound
+    import('./collisions.js').then(module => {
+      if (module.isAudioEnabled && module.isAudioEnabled()) {
+        const gameOverSound = new Audio('./gameover.mp3');
+        gameOverSound.currentTime = 0;
+        gameOverSound.volume = 0.8;
+        gameOverSound.play().catch(error => {
+          console.log('Could not play game over sound:', error);
+        });
+      }
+    });
+    setTimeout(() => {
+      alert('Game Over! Score: ' + getScore());
+      window.location.reload();
+    }, 100);
+  }
+}
+
+export function getGameOverState() {
+  return gameOverState;
+}
+
+export function getInvincibleUntil() {
+  return invincibleUntil;
+}
+
+// Initialize lives display on script load
+if (typeof window !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    updateLivesDisplay();
+  });
+}
+// Also call updateLivesDisplay immediately in case DOMContentLoaded already fired
+updateLivesDisplay();
+
 // Game speed control
 export let gameSpeed = 1.0; // Normal speed
 const minSpeed = 0.1; // Minimum speed (half speed)
