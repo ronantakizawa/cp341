@@ -94,8 +94,6 @@ function parseAngleData(dataString) {
 
   try {
     const parts = dataString.split(',');
-    console.log('Received data:', dataString, 'Parts:', parts.length);
-    if (parts.length === 4) {
       const rawX = parseInt(parts[0]);
       const rawY = parseInt(parts[1]);
       const rawZ = parseInt(parts[2]);
@@ -128,25 +126,11 @@ function parseAngleData(dataString) {
           targetRoll = targetRoll + 0.1 * (0 - targetRoll);
           finalRoll = targetRoll;
         }
-
-
         updateBirdRotation(finalRoll, pitch);
 
         // Handle touch input for height control
         processTouchInput(touch);
       }
-    } else if (parts.length === 3) {
-      // Fallback for old format (roll, pitch, touch)
-      console.log('Using old format');
-      const roll = parseFloat(parts[0]);
-      const pitch = parseFloat(parts[1]);
-      const touch = parseInt(parts[2]);
-
-      if (!isNaN(roll) && !isNaN(pitch) && !isNaN(touch)) {
-        updateBirdRotation(roll, pitch);
-        processTouchInput(touch);
-      }
-    }
   } catch (error) {
     console.log('Parse error:', error);
   }
