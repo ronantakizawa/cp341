@@ -117,3 +117,38 @@ export const NOTIFICATION_MESSAGES = {
   smog: 'Smog and human air pollution can affect bird\'s breathing and vision',
   about: 'Did you know that the bird population in the United States has declined by nearly 3 billion since 1970? That\'s a loss of about 29% of all birds! Habitat loss, climate change, and pollution are major factors. This game aims to raise awareness about the importance of protecting America\'s birds by showing the harmful conditions endured by birds every day'
 };
+
+export const GAME_OVER_CONTENT = `
+  <div style="font-size: 32px; margin-bottom: 20px; color: #ffebee;">
+    🕊️ GAME OVER 🕊️
+  </div>
+
+  <div style="font-size: 24px; margin-bottom: 20px; color: #ffcdd2;">
+    Final Score: {SCORE}
+  </div>
+
+  <div style="font-size: 16px; margin-bottom: 25px; line-height: 1.8;">
+    <strong>Environmental Reality:</strong><br>
+    Colorado's birds face real challenges daily:<br>
+    • Air pollution from cities and wildfires<br>
+    • Habitat loss from rapid development<br>
+    • Climate change & urbanization disrupting migration patterns<br>
+    • Light pollution confusing nocturnal birds
+  </div>
+
+  <div style="margin-bottom: 25px;">
+    <strong>Make a difference for Colorado's birds:</strong><br>
+    <a href="https://www.birdconservancy.org/donate/" target="_blank"
+       style="color: #81c784; text-decoration: underline; font-size: 16px;">
+      Donate to Bird Conservancy of the Rockies →
+    </a>
+  </div>
+
+  <button id="restartGame">
+    🔄 Play Again
+  </button>
+
+  <button id="learnMore">
+    🌱 Learn More
+  </button>
+`;

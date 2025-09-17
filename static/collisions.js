@@ -5,7 +5,7 @@ import { isConnected } from './microbit.js';
 import { startCameraShake, startVisualDistortionEffect } from './scene.js';
 import { pauseGame, resumeGame, incrementScore, getScore, loseLife } from './state.js';
 import { showJetWarning, showSmogWarning, getFirstDistortionShown, setFirstDistortionShown, getFirstSmogShown, setFirstSmogShown } from './notifications.js';
-import { CSS_STYLES } from './config.js';
+import { CSS_STYLES, GAME_OVER_CONTENT } from './config.js';
 
 import * as THREE from 'three';
 
@@ -121,9 +121,6 @@ export function checkJetCollisions() {
       // If bird is too close to jet
       if (distance < 25) {
         object.userData.hitByBird = true;
-
-        // Log the jet hit
-        console.log('Bird hit a jet!');
 
         // Show red flash effect
         showJetFlash();
@@ -263,40 +260,7 @@ export function gameOver() {
   const gameOverScreen = document.createElement('div');
   gameOverScreen.style.cssText = CSS_STYLES.gameOverScreen;
 
-  gameOverScreen.innerHTML = `
-    <div style="font-size: 32px; margin-bottom: 20px; color: #ffebee;">
-      🕊️ GAME OVER 🕊️
-    </div>
-
-    <div style="font-size: 24px; margin-bottom: 20px; color: #ffcdd2;">
-      Final Score: ${getScore()}
-    </div>
-
-    <div style="font-size: 16px; margin-bottom: 25px; line-height: 1.8;">
-      <strong>Environmental Reality:</strong><br>
-      Colorado's birds face real challenges daily:<br>
-      • Air pollution from cities and wildfires<br>
-      • Habitat loss from rapid development<br>
-      • Climate change & urbanization disrupting migration patterns<br>
-      • Light pollution confusing nocturnal birds
-    </div>
-
-    <div style="margin-bottom: 25px;">
-      <strong>Make a difference for Colorado's birds:</strong><br>
-      <a href="https://www.birdconservancy.org/donate/" target="_blank"
-         style="color: #81c784; text-decoration: underline; font-size: 16px;">
-        Donate to Bird Conservancy of the Rockies →
-      </a>
-    </div>
-
-    <button id="restartGame">
-      🔄 Play Again
-    </button>
-
-    <button id="learnMore">
-      🌱 Learn More
-    </button>
-  `;
+  gameOverScreen.innerHTML = GAME_OVER_CONTENT.replace('{SCORE}', getScore());
 
   // Add to page
   document.body.appendChild(gameOverScreen);
