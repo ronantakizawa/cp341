@@ -1,7 +1,9 @@
 ## Colorado Sky Runner ##
 ## Owen - Ronan - Nate ##
 
-<img width="1391" height="671" alt="Screenshot 2025-09-16 at 11 43 12 AM" src="https://github.com/user-attachments/assets/f7a9cf2c-4bae-41cb-b3ea-476aab5cefd5" />
+
+https://github.com/user-attachments/assets/79ed0ab1-7282-4611-81a1-29e9baa05728
+
 
 ## Overview ##
 
